@@ -1,0 +1,66 @@
+# Hermitian Euler factors and genus masses
+
+## What is the precedent for the split and inert factors?
+
+### Takeaway
+
+The rational factors are the standard unramified local Euler factors of the rank-indexed unitary mass formula. Computing the factors from finite norm counts is classical. The workbench provides executable and Lean-checked packaging of this calculation for a caller-supplied place orbit.
+
+### Cited Findings
+
+- Gan, Hanke and Yu, *On an exact mass formula of Shimura* (Duke Math. J. 107, 2001, Proposition 2.13, equations (4.2)–(4.3), and Propositions 4.4–4.5). They express the positive definite mass as a Tamagawa factor times rank-indexed special values and bad-place correction factors, with split local groups `GL_m` and finite-place factors from the reductive quotients of parahorics. [Gan–Hanke–Yu, author copy](https://web.math.princeton.edu/~jonhanke/Web-02/Mass-Formula-of-Shimura/shimura-mass.pdf)
+- Kirschmer's 2016 habilitation, Proposition 4.2.7(3), states the exact Hermitian mass as $2^{1-[F:\mathbf Q]m}\prod_{j=1}^m |L_F(1-j,\eta^j)|\prod_v\lambda_v$. The same proposition gives the positive-argument $L_F(j,\eta^j)$ formulation. Theorem 4.2.4 and Lemma 4.2.9 relate local densities to finite reductive group cardinalities and specify split/inert factors. For a unimodular lattice over an unramified quadratic or split local algebra, the latter correction `λ_v` is 1. Distinguish these *corrections* from the standard Euler factors of the $L$-function. [Kirschmer, Chapters 4 and 8](https://www.math.uni-bielefeld.de/~mkirschm/papers/herm.pdf)
+- Jürgens–Zimmermann eqs. (5)–(6) write the unramified inverse density as `∏_{i=1}^m (1−χ(p)^i p^(−i))^(−1)` over an imaginary quadratic field and supply the exceptional factors for ramified places. The supported terms of an adjacent-rank quotient follow by cancellation. [Jürgens–Zimmermann, §4](https://arxiv.org/pdf/1512.03297#page=14)
+- The local-density literature includes Hironaka's 1999 treatment of unramified Hermitian forms, Mischler's 2000 exact cyclotomic mass formula (Theorem 1.1), and Gan–Yu's smooth integral group model approach (2000, Theorem 7.3). Cho treats the ramified dyadic cases in later papers. [Hironaka](https://www.jstage.jst.go.jp/article/jmath1948/51/3/51_3_553/_article), [Mischler](https://webhomes.maths.ed.ac.uk/~v1ranick/books/dublin.pdf), [Gan–Yu](https://doi.org/10.1215/S0012-7094-00-10535-2), [Cho, Part I](https://arxiv.org/abs/1210.7894), [Cho, Part II](https://arxiv.org/abs/1806.00726)
+- Dumas, Gow and Sheekey's Lemma 2 gives the old isotropic vector count, citing Taylor's *The Geometry of the Classical Groups*, Lemma 10.4 (1992). For rank (m) nondegenerate, subtract their count from (q^{2m}) and divide by (q-1), since nonzero norm values have equal fibers by norm surjectivity. This gives (q^{m-1}(q^m-(-1)^m)) for vectors of Hermitian norm one. [Dumas–Gow–Sheekey, Lemma 2 and reference 6](https://membres-ljk.imag.fr/Jean-Guillaume.Dumas/Publications/symmetricrank.pdf)
+
+### Inferences
+
+- At a split base place (v), write the norm condition as (x\cdot y=1) in (\mathbf F_q^m\times\mathbf F_q^m). Choose nonzero (x) and count the affine hyperplane of (y). The count is (q^{m-1}(q^m-1)). At an inert place use the cited unit-vector count. Divide by (q^{2m-1}), then invert, for (q^m/(q^m-1)) and (q^m/(q^m-(-1)^m)), respectively. These equal (L_v(m,\eta_v^m)) according to the standard Euler product. A split orbit consists of both extension primes and has this one rational base-place factor. The workbench's per-extension-prime square root is a way of partitioning the same positive factor, with the rational radicand represented exactly. For an inert extension prime the absolute prime norm is (q^2), while (q) here is the base residue cardinality. [Kirschmer, Prop. 4.2.7](https://www.math.uni-bielefeld.de/~mkirschm/papers/herm.pdf), [Dumas–Gow–Sheekey](https://membres-ljk.imag.fr/Jean-Guillaume.Dumas/Publications/symmetricrank.pdf)
+- For (m\ge2) and a complete set of finite places above rational primes through (B\ge1), the workbench's tail bound follows by elementary comparison. For every omitted (v\mid p), the factor and inverse are at most `(1−p^(−2))^(−1)` since (q_v\ge p). There are at most ([F:\mathbf Q]) places above (p). Extend the comparison product to all integers (n>B), then telescope `∏(1−n^(−2))^(−1)` to ((B+1)/B). Raise this to ([F:\mathbf Q]) for the upper bound and invert for the lower bound. At even rank the lower bound improves to 1 as the factors are all at least 1. Absolute convergence and convergence of such Euler products are classical. The exact rational interval and its integration into the checker are defensible descriptions of the implementation. [Kirschmer, Thm. 4.1.2](https://www.math.uni-bielefeld.de/~mkirschm/papers/herm.pdf)
+
+### Gaps
+
+- No earlier implementation of this exact Lean API for conjugation-orbit factors, with this finite tail bound and premise layout, surfaced in the search. An exhaustive proof-assistant or software novelty search was outside scope.
+
+## Were the named Gaussian and cyclotomic masses known?
+
+### Takeaway
+
+The Gaussian values appear verbatim in Schiemann's published computed tables. The standard rank-three cyclotomic lattice is explicitly present in Kirschmer's published single-class data. The cyclotomic values in all three ranks follow by exact specialization of published formulas. I independently computed the three requisite special values with rational arithmetic.
+
+### Cited Findings
+
+- Schiemann's 1998 neighbor-method paper implements Hermitian genus enumeration in dimension at least two. His companion tables give one class with identity Gram matrix and automorphism orders (32) and (384) for the Gaussian standard genera of ranks 2 and 3, respectively, listing exact masses (1/32) and (1/384). The table index identifies Schiemann as the author. [Schiemann, 1998](https://www.sciencedirect.com/science/article/pii/S0747717198902255), [Table attribution](https://www.math.uni-sb.de/ag/schulze/Hermitian-lattices/), [Gaussian rank 2](https://www.math.uni-sb.de/ag/schulze/Hermitian-lattices/D-4/dim2), [Gaussian rank 3](https://www.math.uni-sb.de/ag/schulze/Hermitian-lattices/D-4/dim3)
+- Jürgens–Zimmermann's (5) is explicit about the factor (1-2^{-m}) for an odd lattice of even rank at ramified (p=2), hence (3/4) for rank 2. The identity lattice is odd because it represents 1. At odd rank the factor in their convention is 1. Their Corollary 4.3 gives (1/4\cdot1/24\cdot(3/4)\cdot4=1/32) for the Gaussian rank-2 lattice and (1/4\cdot1/24\cdot( (3/2)/6)=1/384) in rank 3. Here (|B_2|=1/6), (|B_{3,\chi_{-4}}|=3/2), and the field has class number one, so the partial mass is the whole mass. Treat (3/4) as specific to their normalization. Other rearrangements absorb factors of 2 or the discriminant into the finite correction. [Jürgens–Zimmermann, Eq. (5) and Cor. 4.3](https://arxiv.org/pdf/1512.03297#page=14), [Gaussian entries](https://www.math.uni-sb.de/ag/schulze/Hermitian-lattices/D-4/dim2)
+- Kirschmer's public dataset `res_herm.tar.bz2` contains `res_herm.m`, and the first listed genus of `Result3CN1[9]` has field data `[-3,0,1]` and `[[1,0],[0,0],[1,0]]` (i.e. (F=\mathbf Q(\sqrt3)), (E=F[i])), diagonal `[1,0]` (padded scalar 1), and the three standard basis generators. I parsed the archive directly. Archive SHA-256 `4caf7463b3a84cefbec7626976186da0bb7b6af6d4c082a4eb3024987253c4a6`. The hosting author page defines the indices and coordinates, identifies these as one-class genera and warns its rank-2 data is restricted to imaginary quadratic fields. [Classification and data format](https://www.math.rwth-aachen.de/~Markus.Kirschmer/forms/), [Classification data archive](https://www.math.rwth-aachen.de/~Markus.Kirschmer/forms/res_herm.tar.bz2)
+- For standard rank-two cyclotomic lattices, Mureau (2025), Theorem 3.11 and Lemma 3.12, explicitly describe the same mass computation for arbitrary cyclotomic conductor. The proof treats the split/inert local corrections as 1 in the case of conductor (12). The paper's numerical examples concern other conductors so it is a source for the specialization, without a verified verbatim $1/288$ entry. [Mureau, §3.3](https://eprint.iacr.org/2025/940.pdf#page=21)
+
+### Inferences
+
+- For (E=\mathbf Q(\zeta_{12})), (F=\mathbf Q(\sqrt3)), the relative discriminant ideal has norm (144/12^2=1), so the standard unimodular lattice has no finite correction in Kirschmer’s formula. Biquadratic zeta factorization gives $L_F(s,\eta)=L(s,\chi_{-3})L(s,\chi_{-4})$ and $\zeta_F(s)=\zeta(s)L(s,\chi_{12})$. Using $L(1-n,\chi)=-f^{n-1}\sum_a\chi(a)B_n(a/f)/n$, exact arithmetic yields $L_F(0,\eta)=1/6$, $\zeta_F(-1)=1/6$, $L_F(-2,\eta)=1/9$. One way to reproduce is to use the nonzero character coefficients (+1,-1) on ((1,2)\bmod3) and on ((1,3)\bmod4), and (+1,-1,-1,+1) on ((1,5,7,11)\bmod12). The prefactor (2^{1-2m}) gives masses $1/12,1/288,1/10368$ and consecutive ratios $1/24,1/36$. This proof uses classical formulas independent of the workbench's Lean derivation. [Field and subfields data](https://www.lmfdb.org/NumberField/4.0.144.1), [Real field data](https://www.lmfdb.org/NumberField/2.2.12.1), [Kirschmer Prop. 4.2.7(3)](https://www.math.uni-bielefeld.de/~mkirschm/papers/herm.pdf), [Finite Dirichlet special-value sum](https://dlmf.nist.gov/25.15.E3), [Hurwitz values](https://dlmf.nist.gov/25.11.E14)
+- Independent stabilizer check in these cyclotomic ranks: If a standard Hermitian unit vector has nonzero coordinate (a), both real embeddings of (a\bar a) lie in ((0,1]). Their product is a positive rational integer, hence 1. Thus each embedding equals 1 and all other coordinates vanish. Such a coordinate is a norm-one unit and a root of unity, because its powers are integral with bounded archimedean conjugates. Every automorphism is accordingly monomial, with order (12^m m!) from the 12 roots of unity. These reciprocal orders exhaust the masses, proving one class in the standard genus for each of the three ranks. This also gives $1/10368$ independently by weighing the class in Kirschmer's rank-three archive. [Roots of unity data](https://www.lmfdb.org/NumberField/4.0.144.1), [One-class data](https://www.math.rwth-aachen.de/~Markus.Kirschmer/forms/)
+
+### Gaps
+
+- I did not find a published row explicitly printing the fractions $1/288$ and $1/10368$ next to this cyclotomic lattice. The earlier general formulas determine both, and the rank-three isometry-class result was already explicitly tabulated. The workbench can claim an exact worked example and independent check, without claiming either value as a new mass formula or classification.
+
+## Is mass equality as a completeness certificate new?
+
+### Takeaway
+
+The reciprocal-order weighting and its use as a stopping criterion already appear in mathematical literature and deployed computer algebra. The workbench may have a distinctive independently replayable and Lean-checked interface that makes the hypotheses explicit.
+
+### Cited Findings
+
+- Cho's 2018 article motivates the mass formula by the need to enumerate all classes, defining mass as `Σ 1/#Aut(L')`. Schiemann's 1998 paper treats effective Hermitian neighbor enumeration and Kirschmer's 2016 habilitation §5.4 gives algorithms to cover genera, with further bounded-class-number enumeration in Chapter 6. [Cho](https://doi.org/10.1093/imrn/rnw340), [Schiemann](https://www.sciencedirect.com/science/article/pii/S0747717198902255), [Kirschmer](https://www.math.uni-bielefeld.de/~mkirschm/papers/herm.pdf)
+- Magma's `GenusRepresentatives(L)` has `UseMass=true` by default and documents that `UseMass=false` disables the mass formula stopping criterion and computes the entire neighbor closure. Its number field lattices chapter also documents `Mass` and `LocalMass` for Hermitian lattices and explains the explicit special-value formula. [Magma Number Field Lattices](https://magma.maths.usyd.edu.au/magma/handbook/text/348)
+- Hecke.jl documents `mass(L::HermLat) -> fmpq` (exact rational), local and global genus symbols, representatives of a given genus and genus-membership tests. Those capabilities exceed the workbench's arithmetic on supplied rows, with a different verification model. [Hecke.jl, Genera for Hermitian Lattices](https://docs.hecke.thofma.com/v0.17/quad_forms/genusherm/)
+
+### Inferences
+
+- Given distinct representatives in the genus and verified full orders, every additional class would have positive weight, so equality with an independently certified total proves completeness. Duplicates, unchecked membership or stabilizers, mismatched/full-vs-projective normalizations, and a partial Euler product without a valid tail term invalidate the reasoning. The theorem formalized in the workbench packages this known logical implication. It does not generate the needed premises. [Magma implementation documentation](https://magma.maths.usyd.edu.au/magma/handbook/text/348), [Cho mass definition](https://doi.org/10.1093/imrn/rnw340)
+
+### Gaps
+
+- I found no directly matching published Lean or other proof-assistant checker for exactly this combination of the Hermitian local factors, separately supplied exact masses and stabilizer-weight completeness. Search-result absence supports a qualified comparison only.
