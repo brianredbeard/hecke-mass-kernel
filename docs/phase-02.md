@@ -23,9 +23,9 @@ The Lean fixture generator also checks the five supplied absolute-mass products.
 
 The upstream emitter compiled 12 rank-eight polynomial presentations with four local `IsGood` assertions per input, and its separate table replay compiled 13 certificates. It rejected six invalid raw inputs on their respective clauses. Every published host has odd rank. The rank-eight samples also share the bad prime 2, which violates the host disjointness premise.
 
-Phase 2.1 adds two distinct local certificate families at rank nine, the least odd rank in the local degree window. Each uses $\mathbf F_{97}$ and $\mathbf F_{91249}$, verifies local `IsGood` in both character orientations, and has disjoint exceptional sets. The upstream receipt records compile times of 19.80 s and 21.91 s. The independent arithmetic replay reproduced all 72 root coordinates from the supplied polynomial data.
+Using Alpöge’s original Lean formalization, the Phase 2.1 analysis constructed two explicit rank-nine polynomial families satisfying `Formalism.CyclotomicNorms.IsGood` at both 97 and 91,249 in both character orientations, with disjoint exceptional sets. Rank nine is the least odd rank in the local degree window. The upstream receipt records compile times of 19.80 s and 21.91 s. The independent arithmetic replay reproduced all 72 root coordinates from the supplied polynomial data. [Original predicate](https://github.com/homeowmorphism/riemann-hypothesis-original/blob/4e8bb36faa8c9e3f1bda144ccf5a637f8b96066e/src/Formalism/CyclotomicNorms/StatementT.lean#L19) · [Source and analysis citations](references.md)
 
-The upstream Lean theorem `host_prime_lower_bound` requires each selected prime of a published rank-nine host to exceed 4,700,224. This excludes both local certificate primes. A separate arithmetic replay confirmed that 279,354,519,121 and 279,379,969,937 satisfy the example's conductor congruences and disjointness. A full rank-nine host with compatible polynomial and character data remains open.
+The analysis proves from the published host hypotheses that every level prime of a rank-nine global host must exceed 4,700,224. This excludes both local certificate primes. A separate arithmetic replay confirmed that 279,354,519,121 and 279,379,969,937 satisfy the example's conductor congruences and disjointness. A complete rank-nine global host remains open in the Phase 2.1 analysis. The witness theorems `RankNine.concrete_0` and `RankNine.concrete_1` are in `RankNineWitnesses.lean`. The bound `host_prime_lower_bound` is in `RankNine.lean`, in the same `proof_profile/research/phase-02/gaps/rank-nine/` workbench directory.
 
 ## PairGood
 
@@ -46,7 +46,7 @@ The original review matched all 109 local Phase 02 manifest entries. For Phase 2
 
 ## Provenance and replay
 
-The source is the Phase 02 workbench at revision `4e8bb36faa8c9e3f1bda144ccf5a637f8b96066e`, built upstream with Lean 4.33.1. Under `proof_profile/research/phase-02/`, the compact Lean cases use `workbench-modular/{certificates,result}.json`, `workbench-hermitian/{singletons,determinant-five,result}.json`, and the products documented in `gaps/absolute-mass/review.md`.
+The Phase 02 workbench uses Alpöge’s frozen source edition and Lean 4.33.1. Under `proof_profile/research/phase-02/`, the compact Lean cases use `workbench-modular/{certificates,result}.json`, `workbench-hermitian/{singletons,determinant-five,result}.json`, and the products documented in `gaps/absolute-mass/review.md`. [Frozen edition and workbench citations](references.md)
 
 The standalone kernel replay uses the repository's pinned Lean toolchain and checked-in cases.
 

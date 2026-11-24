@@ -11,7 +11,7 @@ Arithmetic follows the extracted Lean model. Fractions have positive denominator
 
 A geometric interpretation requires certificates about the supplied input. For a class mass, the orders must belong to a complete set of inequivalent classes and count their stabilizers. For a Hecke coefficient, the samples must come from the appropriate coset representatives and function values, with the matching local parameters and character. The finite calculation gives \(5/12\) on the two stabilizer orders \(4,6\) supplied by the level-11 workbench.
 
-The Lean arithmetic adapts `extracted/hecke-mass-kernel/Minimal.lean` from the research workbench. Its extraction targets `GlobalTheory.Mass.classMass` and `GlobalTheory.SeriesTie.Setup.hecke` in the upstream formalization at revision `4e8bb36faa8c9e3f1bda144ccf5a637f8b96066e`.
+The Lean arithmetic adapts `extracted/hecke-mass-kernel/Minimal.lean` from the research workbench. Its extraction targets `GlobalTheory.Mass.classMass` and `GlobalTheory.SeriesTie.Setup.hecke` in Alpöge’s original Lean formalization. [Frozen edition and workbench citations](references.md)
 
 ## Scaffold probe
 
