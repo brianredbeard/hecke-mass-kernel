@@ -1,6 +1,6 @@
 # Hecke mass kernel
 
-This repository develops an exact arithmetic kernel for class masses and normalized Hecke coefficients from finite tables. Lean defines both operations and generates shared test fixtures. The native integration scaffold also includes an optional RISC-V Vector (RVV) backend for its build probe.
+This repository implements exact arithmetic for class masses and normalized Hecke coefficients from finite tables. Lean defines both operations and generates shared test fixtures for the native C and Rust libraries. The C integration scaffold also includes an optional RISC-V Vector (RVV) backend for its build probe.
 
 | Path | Purpose |
 | --- | --- |
@@ -13,7 +13,7 @@ This repository develops an exact arithmetic kernel for class masses and normali
 
 ## Quick start
 
-Run each check from the repository root. Use Elan with the checked-in toolchain for Lean, CMake 3.16 or newer and a C compiler for C, and Cargo for Rust.
+Run each check from the repository root. Use Elan with the checked-in toolchain for Lean, CMake 3.16 or newer with a C compiler and GMP development files for C, and Cargo for Rust.
 
 ```sh
 (cd lean && lake build)

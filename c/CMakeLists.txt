@@ -5,6 +5,7 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 option(HECKE_MASS_ENABLE_RVV "Build the scaffold probe for RV64 with V" OFF)
+option(HECKE_MASS_BUILD_FINITE_KERNEL "Build the GMP-backed finite kernel" ON)
 
 add_library(hecke_mass)
 add_library(HeckeMass::hecke_mass ALIAS hecke_mass)
@@ -23,6 +24,17 @@ else()
 endif()
 
 set(package_dir "${CMAKE_INSTALL_LIBDIR}/cmake/HeckeMass")
+if(HECKE_MASS_BUILD_FINITE_KERNEL)
+    include(cmake/HeckeMassGMP.cmake)
+    if(NOT TARGET HeckeMassGMP::GMP)
+        message(FATAL_ERROR "The HeckeMass finite kernel requires GMP headers and library.")
+    endif()
+    target_sources(hecke_mass PRIVATE src/kernel.c)
+    target_link_libraries(hecke_mass PUBLIC HeckeMassGMP::GMP)
+    install(FILES include/hecke_mass/kernel.h DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/hecke_mass")
+    install(FILES cmake/HeckeMassGMP.cmake DESTINATION "${package_dir}")
+endif()
+
 configure_package_config_file(cmake/HeckeMassConfig.cmake.in
     "${CMAKE_CURRENT_BINARY_DIR}/HeckeMassConfig.cmake"
     INSTALL_DESTINATION "${package_dir}"
@@ -35,7 +47,7 @@ install(TARGETS hecke_mass EXPORT HeckeMassTargets
     LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
 )
-install(DIRECTORY include/ DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+install(FILES include/hecke_mass/scaffold.h DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/hecke_mass")
 install(EXPORT HeckeMassTargets NAMESPACE HeckeMass:: DESTINATION "${package_dir}")
 install(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/HeckeMassConfig.cmake"
@@ -50,5 +62,11 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
         target_link_libraries(hecke_mass_scaffold_vectors PRIVATE HeckeMass::hecke_mass)
         add_test(NAME scaffold_vectors COMMAND hecke_mass_scaffold_vectors
             "${CMAKE_CURRENT_SOURCE_DIR}/../tests/vectors/scaffold.csv")
+        if(HECKE_MASS_BUILD_FINITE_KERNEL)
+            add_executable(hecke_mass_kernel_vectors tests/kernel_vectors.c)
+            target_link_libraries(hecke_mass_kernel_vectors PRIVATE HeckeMass::hecke_mass)
+            add_test(NAME kernel_vectors COMMAND hecke_mass_kernel_vectors
+                "${CMAKE_CURRENT_SOURCE_DIR}/../tests/vectors/kernel.tsv")
+        endif()
     endif()
 endif()

@@ -1,10 +1,28 @@
-#include <hecke_mass/scaffold.h>
+#include <hecke_mass/kernel.h>
 
 int main(void)
 {
-    const uint32_t input = 0;
-    uint32_t output;
+    mpz_t four, six, q, k, rank;
+    mpq_t result, u, first, second;
+    mpz_init_set_ui(four, 4);
+    mpz_init_set_ui(six, 6);
+    mpz_init_set_ui(q, 3);
+    mpz_init_set_ui(k, 1);
+    mpz_init_set_ui(rank, 3);
+    mpq_inits(result, u, first, second, NULL);
+    mpq_set_si(u, -1, 1);
+    mpq_set_si(first, 2, 1);
+    mpq_set_si(second, 4, 1);
 
-    hecke_mass_scaffold_probe(&input, &output, 1);
-    return output == UINT32_C(0xa5a5a5a5) ? 0 : 1;
+    const mpz_srcptr orders[] = {four, six};
+    hecke_mass_class_mass(result, orders, 2);
+    int mass_ok = mpq_cmp_ui(result, 5, 12) == 0;
+
+    const mpq_srcptr samples[] = {first, second};
+    hecke_mass_hecke(result, u, q, k, rank, samples, 2);
+    int hecke_ok = mpq_cmp_si(result, -2, 1) == 0;
+
+    mpq_clears(result, u, first, second, NULL);
+    mpz_clears(four, six, q, k, rank, NULL);
+    return mass_ok && hecke_ok ? 0 : 1;
 }

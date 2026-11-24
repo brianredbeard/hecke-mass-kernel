@@ -2,7 +2,7 @@
 
 ## C with CMake
 
-Build and install the library, then configure the standalone consumer against the install prefix. Run these commands from the repository root.
+Install GMP development files, then build and install the library and configure the standalone consumer against the install prefix. Run these commands from the repository root.
 
 ```sh
 cmake -S c -B build/c -DCMAKE_BUILD_TYPE=Release
@@ -14,7 +14,7 @@ cmake --build build/c-example
 (cd build/c-example && ctest --output-on-failure)
 ```
 
-Use `find_package(HeckeMass CONFIG REQUIRED)` in the consumer project and link the `HeckeMass::hecke_mass` target. The target supplies the include path for `<hecke_mass/scaffold.h>`. `hecke_mass_scaffold_probe` accepts separate input and output buffers or operates in place. For library-only builds, configure with `-DBUILD_TESTING=OFF`.
+Use `find_package(HeckeMass CONFIG REQUIRED)` in the consumer project and link the `HeckeMass::hecke_mass` target. The target supplies the include path for `<hecke_mass/kernel.h>` and links GMP. `hecke_mass_class_mass` accepts an array of GMP integer pointers and `hecke_mass_hecke` accepts a character value, three integer parameters, and a sample array. Both write into a caller-initialized GMP rational. Integer inputs must be nonnegative and rational inputs must be canonical. For library-only builds, configure with `-DBUILD_TESTING=OFF`.
 
 ## Rust with Cargo
 
@@ -37,7 +37,7 @@ hecke-mass-kernel = { git = "https://github.com/brianredbeard/hecke-mass-kernel.
 
 `-DHECKE_MASS_ENABLE_RVV=ON` selects the RV64GCV implementation of the C scaffold probe. The resulting library requires a CPU or emulator with the RISC-V Vector extension. The CMake target and public header are the same for either backend.
 
-For a Linux cross-build, the CI recipe uses Clang 18, a RISC-V GNU cross toolchain, and QEMU user-mode emulation on Ubuntu 24.04.
+For a Linux cross-build of the probe, the CI recipe uses Clang 18, a RISC-V GNU cross toolchain, and QEMU user-mode emulation on Ubuntu 24.04. Use `HECKE_MASS_BUILD_FINITE_KERNEL=OFF` for probe-only builds without target GMP. The exact operations use scalar GMP arithmetic.
 
 ```sh
 cmake -S c -B build/rvv \
@@ -48,7 +48,8 @@ cmake -S c -B build/rvv \
   -DCMAKE_C_COMPILER_TARGET=riscv64-linux-gnu \
   -DCMAKE_C_FLAGS=--gcc-toolchain=/usr \
   '-DCMAKE_CROSSCOMPILING_EMULATOR=qemu-riscv64;-L;/usr/riscv64-linux-gnu' \
-  -DHECKE_MASS_ENABLE_RVV=ON
+  -DHECKE_MASS_ENABLE_RVV=ON \
+  -DHECKE_MASS_BUILD_FINITE_KERNEL=OFF
 cmake --build build/rvv
 (cd build/rvv && QEMU_CPU=rv64,v=true,vlen=128,elen=64 ctest --output-on-failure)
 ```

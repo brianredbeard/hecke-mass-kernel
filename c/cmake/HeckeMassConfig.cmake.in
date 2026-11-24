@@ -1,4 +1,13 @@
 @PACKAGE_INIT@
 
+if(@HECKE_MASS_BUILD_FINITE_KERNEL@)
+    include("${CMAKE_CURRENT_LIST_DIR}/HeckeMassGMP.cmake")
+    if(NOT TARGET HeckeMassGMP::GMP)
+        set(HeckeMass_FOUND FALSE)
+        set(HeckeMass_NOT_FOUND_MESSAGE "The HeckeMass finite kernel requires GMP headers and library.")
+        return()
+    endif()
+endif()
+
 include("${CMAKE_CURRENT_LIST_DIR}/HeckeMassTargets.cmake")
 check_required_components(HeckeMass)
