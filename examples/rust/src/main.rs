@@ -1,4 +1,14 @@
+use hecke_mass_kernel::{class_mass, hecke, BigRational};
+
 fn main() {
-    let output = hecke_mass_kernel::scaffold_probe(&[0]);
-    assert_eq!(output, [0xa5a5_a5a5]);
+    let mass = class_mass(&[4u32.into(), 6u32.into()]);
+    assert_eq!(mass.to_string(), "5/12");
+
+    let u = BigRational::from_integer((-1).into());
+    let samples = [
+        BigRational::from_integer(2.into()),
+        BigRational::from_integer(4.into()),
+    ];
+    let coefficient = hecke(&u, &3u32.into(), &1u32.into(), &3u32.into(), &samples);
+    assert_eq!(coefficient.to_string(), "-2");
 }

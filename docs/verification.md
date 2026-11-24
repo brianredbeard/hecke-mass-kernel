@@ -23,6 +23,6 @@ mkdir -p build
   cp build/kernel.tsv tests/vectors/kernel.tsv
 ```
 
-`tests/vectors/kernel.tsv` has three tab-separated columns for the operation, space-separated inputs and reduced rational output. For `mass` the inputs are the orders. For `hecke` the first four inputs are `u q k rank`, followed by the samples.
+`tests/vectors/kernel.tsv` has three tab-separated columns for the operation, space-separated inputs and reduced rational output. For `mass` the inputs are the orders. For `hecke` the first four inputs are `u q k rank`, followed by the samples. The Rust integration test runs every row against the public API.
 
-CI compares freshly generated fixtures with the checked-in file. The C and Rust tests use the shared fixtures across a range of batch lengths. The C test also covers in-place operation. The RVV job runs the C test under QEMU at two vector lengths. Agreement across the compiled libraries is established for those test cases. The Lean theorems apply to the Lean reference.
+CI compares freshly generated fixtures with the checked-in files. The C and Rust scaffold tests use the probe fixtures across a range of batch lengths. The C probe test also covers in-place operation. The RVV job runs that test under QEMU at two vector lengths. The Lean theorems apply to the Lean reference.

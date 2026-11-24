@@ -31,7 +31,7 @@ Use a path dependency pointing to the repository's `rust/` directory in a local 
 hecke-mass-kernel = { git = "https://github.com/brianredbeard/hecke-mass-kernel.git", rev = "<commit>" }
 ```
 
-`hecke_mass_kernel::scaffold_probe` takes a `&[u32]` and returns a `Vec<u32>`. The crate builds with Cargo and has no C or Lean build dependencies.
+`hecke_mass_kernel::class_mass` takes a slice of `BigUint` orders. `hecke_mass_kernel::hecke` takes a `BigRational` character value, three `BigUint` parameters, and a slice of `BigRational` samples. Both return a `BigRational` in lowest terms. The crate reexports these types and builds with Cargo independently of C and Lean.
 
 ## RISC-V Vector backend
 
