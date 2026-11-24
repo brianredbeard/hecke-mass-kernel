@@ -14,4 +14,6 @@ Use a separate bibliography entry for the analysis. Fill in the analysts’ name
 
 Cite the research report for the extraction methods and mathematical experiments. Cite the Phase 2.1 verification receipt for exact test counts and transitive axiom footprints. The report is `docs/REVERSE_ENGINEERING_REPORT.md` and the receipt is `proof_profile/research/phase-02/release/verification.json` in the workbench source tree.
 
+The [finite double-coset sum write-up](primitive-in-the-proof.md) documents the classical precedents and the two audited proof paths.
+
 The factoring audit reports that it found no public-input factoring algorithm in the audited dependency paths.
