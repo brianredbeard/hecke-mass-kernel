@@ -1,6 +1,10 @@
 # Hecke mass kernel
 
-This repository implements exact arithmetic for class masses and normalized Hecke coefficients from finite tables. Lean defines both operations and generates shared test fixtures for the native C and Rust libraries. The C integration scaffold also includes an optional RISC-V Vector (RVV) backend for its build probe.
+This repository implements exact arithmetic for class masses and
+normalized Hecke coefficients from finite tables. Lean defines both
+operations and generates shared test fixtures for the native C and Rust
+libraries. The C integration scaffold also includes an optional RISC-V
+Vector (RVV) backend for its build probe.
 
 | Path | Purpose |
 | --- | --- |
@@ -14,7 +18,8 @@ This repository implements exact arithmetic for class masses and normalized Heck
 
 ## Explainer videos
 
-Two silent, subtitled animations introduce the kernel without assuming any number theory. Click a frame to play the video.
+Two silent, subtitled animations introduce the kernel without assuming any
+number theory. Click a frame to play the video.
 
 | What the kernel computes (8 min) | Where the proof uses it (2 min) |
 | :---: | :---: |
@@ -25,7 +30,9 @@ Two silent, subtitled animations introduce the kernel without assuming any numbe
 
 ## Quick start
 
-Run each check from the repository root. Use Elan with the checked-in toolchain for Lean, CMake 3.16 or newer with a C compiler and GMP development files for C, and Cargo for Rust.
+Run each check from the repository root. Use Elan with the checked-in
+toolchain for Lean, CMake 3.16 or newer with a C compiler and GMP
+development files for C, and Cargo for Rust.
 
 ```sh
 (cd lean && lake build)
@@ -36,6 +43,31 @@ cmake --build build/c
 
 cargo test --manifest-path rust/Cargo.toml
 ```
+
+## Where this came from
+
+In November 2026 Levent Alpöge published a Lean formalization claiming a
+proof of the Riemann Hypothesis. Many readers have questioned whether the
+proof as a whole is valid. This repository takes no position on that.
+
+I went looking for something else: what is inside the proof that is true
+and useful whatever happens to the headline theorem? A formalization that
+size is built from many smaller definitions and lemmas, and each of them
+can be checked on its own.
+
+This kernel is one such piece. Two definitions in the formalization,
+`classMass` and `Setup.hecke`, reduce to the same small computation: an
+exact sum over a finite table. I extracted that arithmetic, restated it in
+Lean as a standalone project with its own proofs, and implemented it in C
+and Rust against fixtures that Lean generates. Nothing here depends on the
+Riemann Hypothesis or on the rest of Alpöge's proof.
+
+The arithmetic itself is classical. Reciprocal-stabilizer masses and Hecke
+sums over coset representatives go back to Eichler, Gross and others. What
+is new is identifying the shared primitive inside the formalization,
+extracting it, and tracing how the proof uses its two forms. [How the
+proof uses it](docs/primitive-in-the-proof.md) · [Source and
+citations](docs/references.md)
 
 - [Kernel specification](docs/specification.md)
 - [How the finite double-coset sums are used in the formalization](docs/primitive-in-the-proof.md)
