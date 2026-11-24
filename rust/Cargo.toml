@@ -1,0 +1,6 @@
+[package]
+name = "hecke-mass-kernel"
+version = "0.1.0"
+edition = "2021"
+description = "Rust library scaffold for the Hecke mass kernel"
+publish = false

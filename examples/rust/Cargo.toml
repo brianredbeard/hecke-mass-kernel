@@ -1,0 +1,8 @@
+[package]
+name = "hecke-mass-rust-example"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+hecke-mass-kernel = { path = "../../rust" }

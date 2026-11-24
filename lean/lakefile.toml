@@ -1,0 +1,10 @@
+name = "hecke_mass_kernel"
+version = "0.1.0"
+defaultTargets = ["HeckeMassKernel"]
+
+[[lean_lib]]
+name = "HeckeMassKernel"
+
+[[lean_exe]]
+name = "scaffold_vectors"
+root = "ScaffoldVectors"

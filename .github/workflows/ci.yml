@@ -1,0 +1,73 @@
+name: CI
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  lean:
+    name: Lean proofs and fixture generation
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: lean
+          build: 'true'
+      - name: Compare generated fixtures
+        working-directory: lean
+        run: |
+          lake exe scaffold_vectors > "$RUNNER_TEMP/scaffold.csv"
+          diff -u ../tests/vectors/scaffold.csv "$RUNNER_TEMP/scaffold.csv"
+
+  c:
+    name: Portable C and installed consumer
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and test portable C
+        run: |
+          cmake -S c -B build/c -DCMAKE_BUILD_TYPE=Release
+          cmake --build build/c
+          ctest --test-dir build/c --output-on-failure
+      - name: Build and test the standalone CMake consumer
+        run: |
+          cmake --install build/c --prefix "$RUNNER_TEMP/hecke-mass"
+          cmake -S examples/c -B build/c-example -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/hecke-mass"
+          cmake --build build/c-example
+          ctest --test-dir build/c-example --output-on-failure
+
+  rust:
+    name: Native Rust and Cargo consumer
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo test --manifest-path rust/Cargo.toml
+      - run: cargo run --locked --manifest-path examples/rust/Cargo.toml
+
+  rvv:
+    name: RISC-V Vector fixtures
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install cross compiler and emulator
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-18 gcc-riscv64-linux-gnu qemu-user
+      - name: Cross-build the RVV library and tests
+        run: |
+          cmake -S c -B build/rvv \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_SYSTEM_NAME=Linux \
+            -DCMAKE_SYSTEM_PROCESSOR=riscv64 \
+            -DCMAKE_C_COMPILER=clang-18 \
+            -DCMAKE_C_COMPILER_TARGET=riscv64-linux-gnu \
+            -DCMAKE_C_FLAGS=--gcc-toolchain=/usr \
+            '-DCMAKE_CROSSCOMPILING_EMULATOR=qemu-riscv64;-L;/usr/riscv64-linux-gnu' \
+            -DHECKE_MASS_ENABLE_RVV=ON
+          cmake --build build/rvv
+      - name: Run the fixtures with 128-bit and 256-bit vectors
+        run: |
+          QEMU_CPU=rv64,v=true,vlen=128,elen=64 ctest --test-dir build/rvv --output-on-failure
+          QEMU_CPU=rv64,v=true,vlen=256,elen=64 ctest --test-dir build/rvv --output-on-failure

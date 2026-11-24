@@ -1,0 +1,5 @@
+/build/
+/lean/.lake/
+/proof_profile/
+/rust/Cargo.lock
+target/
