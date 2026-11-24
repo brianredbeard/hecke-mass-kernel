@@ -25,4 +25,6 @@ mkdir -p build
 
 `tests/vectors/kernel.tsv` has three tab-separated columns for the operation, space-separated inputs and reduced rational output. For `mass` the inputs are the orders. For `hecke` the first four inputs are `u q k rank`, followed by the samples. The C and Rust integration tests run every row against their public APIs.
 
+The [Phase 02 workbench review](phase-02.md) identifies the recorded masses and matrices included in these fixtures and the upstream premises behind them.
+
 CI compares freshly generated fixtures with the checked-in files. The C and Rust scaffold tests use the probe fixtures across a range of batch lengths. The C probe test also covers in-place operation. The RVV job runs that test under QEMU at two vector lengths. The Lean theorems apply to the Lean reference.

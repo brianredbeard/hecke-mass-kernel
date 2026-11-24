@@ -27,4 +27,5 @@ cargo test --manifest-path rust/Cargo.toml
 
 - [Kernel specification](docs/specification.md)
 - [Lean proof scope and fixture generation](docs/verification.md)
+- [Phase 02 workbench review and replay coverage](docs/phase-02.md)
 - [CMake, Cargo, and RVV integration](docs/integration.md)
