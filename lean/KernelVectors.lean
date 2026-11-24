@@ -1,4 +1,5 @@
 import HeckeMassKernel.Finite
+import HeckeMassKernel.Phase02Cases
 
 open HeckeMassKernel
 
@@ -25,3 +26,4 @@ def main : IO Unit := do
     let arguments := String.intercalate " " ([u.render, toString q, toString k, toString rank] ++
       values.map Frac.render)
     IO.println s!"hecke\t{arguments}\t{(hecke u q k rank values).render}"
+  Phase02Cases.emit
