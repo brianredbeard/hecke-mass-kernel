@@ -1,6 +1,6 @@
 # Hecke mass kernel
 
-This repository is a proof-of-concept scaffold for a Hecke mass kernel. It connects a Lean specification and executable reference to native C and Rust libraries, with an optional RISC-V Vector (RVV) backend for C. The current code implements a scaffold probe. The mathematical definition of the kernel is pending.
+This repository develops an exact arithmetic kernel for class masses and normalized Hecke coefficients from finite tables. Lean defines both operations and generates shared test fixtures. The native integration scaffold also includes an optional RISC-V Vector (RVV) backend for its build probe.
 
 | Path | Purpose |
 | --- | --- |

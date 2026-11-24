@@ -20,6 +20,8 @@ jobs:
         run: |
           lake exe scaffold_vectors > "$RUNNER_TEMP/scaffold.csv"
           diff -u ../tests/vectors/scaffold.csv "$RUNNER_TEMP/scaffold.csv"
+          lake exe kernel_vectors > "$RUNNER_TEMP/kernel.tsv"
+          diff -u ../tests/vectors/kernel.tsv "$RUNNER_TEMP/kernel.tsv"
 
   c:
     name: Portable C and installed consumer

@@ -1,3 +1,5 @@
+import HeckeMassKernel.Finite
+
 namespace HeckeMassKernel.Scaffold
 
 /-- The per-word operation used to verify the repository scaffold. -/

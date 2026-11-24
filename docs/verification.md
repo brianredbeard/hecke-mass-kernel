@@ -2,6 +2,8 @@
 
 ## Lean
 
+`HeckeMassKernel.Finite` proves the recursive mass equations, the finite Hecke formula and selected exact outputs. These theorems concern the arithmetic on supplied tables. The upstream interpretation of a table as a global mass or Hecke coefficient uses separate bridge theorems and certificates.
+
 `HeckeMassKernel.Scaffold.probeSpec` specifies the scaffold operation on one `UInt32`. The executable reference maps the operation over a list. Lean checks that the reference preserves length and agrees with the specification at every index, including indexes outside the list.
 
 ```sh
@@ -17,6 +19,10 @@ lake build
 mkdir -p build
 (cd lean && lake exe scaffold_vectors) > build/scaffold.csv &&
   cp build/scaffold.csv tests/vectors/scaffold.csv
+(cd lean && lake exe kernel_vectors) > build/kernel.tsv &&
+  cp build/kernel.tsv tests/vectors/kernel.tsv
 ```
+
+`tests/vectors/kernel.tsv` has three tab-separated columns for the operation, space-separated inputs and reduced rational output. For `mass` the inputs are the orders. For `hecke` the first four inputs are `u q k rank`, followed by the samples.
 
 CI compares freshly generated fixtures with the checked-in file. The C and Rust tests use the shared fixtures across a range of batch lengths. The C test also covers in-place operation. The RVV job runs the C test under QEMU at two vector lengths. Agreement across the compiled libraries is established for those test cases. The Lean theorems apply to the Lean reference.

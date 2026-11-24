@@ -1,6 +1,17 @@
 # Kernel specification
 
-The Hecke mass kernel definition is pending. The specification will define the mathematical inputs and outputs, their representation and valid ranges, and the arithmetic and edge cases that the implementations must reproduce. Public kernel signatures and kernel fixture encoding will follow that definition.
+The kernel evaluates two exact rational expressions from finite tables.
+
+| Operation | Inputs | Result |
+| --- | --- | --- |
+| Class mass | Natural stabilizer orders \(d_i\) | \(\sum_i d_i^{-1}\) |
+| Hecke coefficient | Rational character value \(u\), natural parameters \(q,k,r\), rational samples \(v_i\) | \(u^{-1}(q^{k\lfloor r/2\rfloor})^{-1}\sum_i v_i\) |
+
+Arithmetic follows the extracted Lean model. Fractions have positive denominators. Inversion maps zero to zero, powers use \(0^0=1\), and an empty sum is zero. The rational result can be rendered in lowest terms.
+
+A geometric interpretation requires certificates about the supplied input. For a class mass, the orders must belong to a complete set of inequivalent classes and count their stabilizers. For a Hecke coefficient, the samples must come from the appropriate coset representatives and function values, with the matching local parameters and character. The finite calculation gives \(5/12\) on the two stabilizer orders \(4,6\) supplied by the level-11 workbench.
+
+The Lean arithmetic adapts `extracted/hecke-mass-kernel/Minimal.lean` from the research workbench. Its extraction targets `GlobalTheory.Mass.classMass` and `GlobalTheory.SeriesTie.Setup.hecke` in the upstream formalization at revision `4e8bb36faa8c9e3f1bda144ccf5a637f8b96066e`.
 
 ## Scaffold probe
 

@@ -8,3 +8,7 @@ name = "HeckeMassKernel"
 [[lean_exe]]
 name = "scaffold_vectors"
 root = "ScaffoldVectors"
+
+[[lean_exe]]
+name = "kernel_vectors"
+root = "KernelVectors"
