@@ -41,6 +41,7 @@ from manim import (
     RoundedRectangle,
     SurroundingRectangle,
     Text,
+    TransformFromCopy,
     VGroup,
 )
 from style import (
@@ -99,8 +100,6 @@ MASS_LINKS = SHARED_LINKS + len(MASS_BRANCH)
 HECKE_LINKS = SHARED_LINKS + len(HECKE_BRANCH)
 assert (SHARED_LINKS, MASS_LINKS, HECKE_LINKS) == (8, 15, 19)
 
-# Lean files under the public mirror's tree at the frozen commit, counted with the GitHub trees API.
-LEAN_FILES = "175,189"
 FROZEN_COMMIT = "4e8bb36"
 
 FIXTURES = Path(__file__).resolve().parents[2] / "tests" / "vectors" / "kernel.tsv"
@@ -111,16 +110,11 @@ def p2(x: float, y: float) -> np.ndarray:
     return np.array([x, y, 0.0])
 
 
-def short(name: str) -> str:
-    return name.split(".")[-1] if not name.endswith("Setup.hecke") else "Setup.hecke"
-
-
 class WhereTheProofUsesIt(Explainer):
     subtitle_size = 28
 
     def construct(self):
         self.handoff()
-        self.proof_size()
         self.dependency_paths()
         self.volume_identity()
         self.hecke_compatibility()
@@ -130,14 +124,14 @@ class WhereTheProofUsesIt(Explainer):
     def handoff(self):
         mass_card, hecke_card = handoff_cards()
         source = lines(
-            "Two definitions in Alpöge's Lean formalization\nof the Riemann Hypothesis",
+            "Two paths from riemannHypothesis\nin Alpöge's Lean source",
             36,
             INK,
             buff=0.2,
         ).move_to(p2(0, -0.2))
         self.say(
-            "Part 1 ended on these two worked sums. Both formulas are\n"
-            "definitions inside a machine-checked proof.",
+            "We followed two chains of references from the declaration\n"
+            "named riemannHypothesis in Alpöge’s Lean source.",
             FadeIn(mass_card),
             FadeIn(hecke_card),
             FadeIn(source, shift=0.2 * UP),
@@ -152,7 +146,7 @@ class WhereTheProofUsesIt(Explainer):
         )
         caveat = lines(
             "The level-11 example illustrates the arithmetic.\n"
-            "The Lean proof uses the same formulas on its own data.",
+            "The formalization uses its own data.",
             26,
             INK,
             buff=0.15,
@@ -168,66 +162,41 @@ class WhereTheProofUsesIt(Explainer):
         self.read(0.5)
         self.clear_stage()
 
-    # ------------------------------------------------------------- proof size
-    def proof_size(self):
-        root = code_card("riemannHypothesis", 24, INK).move_to(p2(0, 3.0))
-        rng = np.random.default_rng(11)
-        layers, edges, dots = [[root.get_bottom()]], VGroup(), VGroup()
-        for level, count in enumerate([5, 12, 26, 52, 96, 150], start=1):
-            width = 1.6 + 2.05 * level
-            y = 3.0 - 0.72 * level
-            xs = np.sort(rng.uniform(-width / 2, width / 2, count))
-            layer = [p2(x, y + rng.uniform(-0.12, 0.12)) for x in xs]
-            for point in layer:
-                parent = layers[-1][rng.integers(len(layers[-1]))]
-                edges.add(
-                    Line(parent, point, color=DIM, stroke_width=1).set_stroke(
-                        opacity=0.3
-                    )
-                )
-                dots.add(Dot(point, radius=0.035, color=DIM))
-            layers.append(layer)
-        tag = Text("dependency graph, schematic", font_size=20, color=DIM).move_to(
-            p2(4.9, 3.0)
-        )
-        count = VGroup(
-            Text(LEAN_FILES, font_size=60, color=GLOW),
-            Text(
-                "Lean files in the published formalization",
-                font_size=26,
-                color=INK,
-            ),
-            Text(
-                f"public frozen mirror, commit {FROZEN_COMMIT}",
-                font_size=20,
-                color=DIM,
-            ),
-        ).arrange(DOWN, buff=0.18)
-        plate = SurroundingRectangle(
-            count,
-            color=DIM,
-            buff=0.35,
-            corner_radius=0.15,
-            fill_color=BG,
-            fill_opacity=0.94,
-        )
-        self.say(
-            "The proof's top theorem is named riemannHypothesis. The published\n"
-            "formalization behind it has about 175,000 Lean files.",
-            *self.chapter("The proof"),
-            FadeIn(root),
-            FadeIn(tag),
-            LaggedStart(*[Create(edge) for edge in edges], lag_ratio=0.003),
-            LaggedStart(*[FadeIn(dot) for dot in dots], lag_ratio=0.003),
-            run_time=2.2,
-        )
-        self.play(FadeIn(VGroup(plate, count).move_to(p2(0, 0.1))), run_time=0.6)
-        self.read()
-        self.clear_stage()
-
     # ------------------------------------------------------- dependency paths
     def dependency_paths(self):
-        step, origin_x, trunk_y = 0.5, -6.3, 0.4
+        # The equality is a verbatim excerpt of line 80 in the frozen source.
+        filename = mono("AdmQAdmissibleConjugatePairPlaces.lean", 22, DIM)
+        citation = Text(f"line 80 · commit {FROZEN_COMMIT}", font_size=22, color=DIM)
+        header = VGroup(filename, citation).arrange(DOWN, buff=0.14).move_to(p2(0, 2.2))
+        excerpt = VGroup(
+            mono("rd g =", 35),
+            mono("ρ.hecke", 35, BLUE),
+            mono("i j b k P R z (rd f)", 35),
+        ).arrange(RIGHT, buff=0.24)
+        excerpt.move_to(p2(0, 0.85))
+        highlight = SurroundingRectangle(excerpt[1], color=BLUE, buff=0.09)
+        edge = VGroup(
+            code_card("HeckeAt", 24),
+            Arrow(LEFT, RIGHT, color=BLUE),
+            code_card("Setup.hecke", 24, BLUE),
+        ).arrange(RIGHT, buff=0.18)
+        edge.move_to(p2(0, -0.9))
+        self.say(
+            "In the definition of HeckeAt, rd g is the value being specified.\n"
+            "On the right, ρ.hecke applies the Hecke operator to rd f.",
+            *self.chapter("Reading a source reference"),
+            FadeIn(header),
+            FadeIn(excerpt),
+            Create(highlight),
+        )
+        self.read()
+        self.say(
+            "That reference gives one edge from HeckeAt to Setup.hecke.\n"
+            "Watch where it sits in the two paths we traced.",
+            FadeIn(edge),
+        )
+        self.read()
+        step, origin_x, trunk_y = 0.46, -6.25, 0.4
 
         def branch_points(count, direction):
             return [
@@ -257,22 +226,23 @@ class WhereTheProofUsesIt(Explainer):
         mass_lines, mass_nodes = chain(mass_points, AMBER, trunk_points[-1])
         hecke_lines, hecke_nodes = chain(hecke_points, BLUE, trunk_points[-1])
 
-        def name_tag(branch, nodes, name, side, color=INK, size=18):
-            node = nodes[[short(n) for n in branch].index(name)]
-            node.scale(1.9)
-            return mono(name, size, color).next_to(node, side, buff=0.2)
-
-        root_tag = mono("riemannHypothesis", 18, INK).next_to(
+        root_tag = mono("riemannHypothesis", 23, INK).next_to(
             trunk_nodes[0], UP, buff=0.2, aligned_edge=LEFT
         )
         trunk_nodes[0].scale(1.9)
         shared_tag = Text(
-            f"shared path: {SHARED_LINKS} links", font_size=22, color=DIM
+            f"{SHARED_LINKS} shared links", font_size=24, color=INK
         ).next_to(trunk_lines, DOWN, buff=0.25)
+        last_link = VGroup(hecke_nodes[-2], hecke_lines[-1], hecke_nodes[-1])
+        last_link.set_color(GLOW)
         self.say(
-            "Follow references downward: each declaration refers to the\n"
-            "next. One shared dependency path forks into two branches.",
-            *self.chapter("Two dependency paths"),
+            "The highlighted reference ends the blue path. Both paths start\n"
+            "at riemannHypothesis and share their first eight links.",
+            *self.chapter("Two paths from the root declaration"),
+            FadeOut(header),
+            FadeOut(excerpt),
+            FadeOut(highlight),
+            ReplacementTransform(edge, last_link),
             FadeIn(root_tag),
             LaggedStart(*[Create(s) for s in trunk_lines], lag_ratio=0.5),
             LaggedStart(*[FadeIn(n) for n in trunk_nodes], lag_ratio=0.5),
@@ -282,36 +252,37 @@ class WhereTheProofUsesIt(Explainer):
         self.play(
             LaggedStart(*[Create(s) for s in mass_lines], lag_ratio=0.5),
             LaggedStart(*[FadeIn(n) for n in mass_nodes], lag_ratio=0.5),
-            LaggedStart(*[Create(s) for s in hecke_lines], lag_ratio=0.5),
-            LaggedStart(*[FadeIn(n) for n in hecke_nodes], lag_ratio=0.5),
+            LaggedStart(*[Create(s) for s in hecke_lines[:-1]], lag_ratio=0.5),
+            LaggedStart(*[FadeIn(n) for n in hecke_nodes[:-2]], lag_ratio=0.5),
             run_time=2.0,
         )
         self.read()
 
-        volume_tag = name_tag(
-            MASS_BRANCH, mass_nodes, "volumes_eq_masses_of_unfold", UP
+        def endpoint(node, role, name, count, color):
+            return (
+                VGroup(
+                    Text(role, font_size=35, color=color, weight="BOLD"),
+                    mono(f"{name} · {count} links", 20, INK),
+                )
+                .arrange(DOWN, buff=0.15, aligned_edge=LEFT)
+                .next_to(node, RIGHT, buff=0.2)
+            )
+
+        mass_tag = endpoint(
+            mass_nodes[-1], "Volume identity", "classMass", MASS_LINKS, AMBER
         )
-        mass_tag = name_tag(MASS_BRANCH, mass_nodes, "classMass", RIGHT, AMBER, 20)
-        mass_count = Text(
-            f"{MASS_LINKS} dependency links", font_size=26, color=AMBER
-        ).next_to(mass_tag, RIGHT, buff=0.5)
-        tie_tag = name_tag(HECKE_BRANCH, hecke_nodes, "heckeTieT", DOWN)
-        at_tag = name_tag(HECKE_BRANCH, hecke_nodes, "HeckeAt", UP)
-        hecke_tag = name_tag(HECKE_BRANCH, hecke_nodes, "Setup.hecke", RIGHT, BLUE, 20)
-        hecke_count = Text(
-            f"{HECKE_LINKS} dependency links", font_size=26, color=BLUE
-        ).next_to(hecke_tag, DOWN, buff=0.85, aligned_edge=RIGHT)
+        hecke_tag = endpoint(
+            hecke_nodes[-1], "Hecke condition", "Setup.hecke", HECKE_LINKS, BLUE
+        )
+        at_tag = mono("HeckeAt", 19, GLOW).next_to(hecke_nodes[-2], UP, buff=0.16)
         self.say(
-            f"classMass is reached after {MASS_LINKS} dependency links, Setup.hecke\n"
-            f"after {HECKE_LINKS}. The labelled declarations are the ones that matter next.",
+            f"The two paths shown have {MASS_LINKS} and {HECKE_LINKS} links. What does\n"
+            "each definition contribute to the argument?",
             FadeIn(mass_tag),
-            FadeIn(mass_count),
             FadeIn(hecke_tag),
-            FadeIn(hecke_count),
-            FadeIn(volume_tag),
-            FadeIn(tie_tag),
             FadeIn(at_tag),
         )
+        self.mark_poster()
         self.read(0.5)
         self.clear_stage()
 
@@ -329,7 +300,8 @@ class WhereTheProofUsesIt(Explainer):
                 fill_color=color,
                 fill_opacity=opacity,
             ).move_to(p2(left + width * (start + share / 2), bar_y))
-            return VGroup(box, MathTex(label, font_size=46, color=INK).move_to(box))
+            ink = BG if opacity >= 0.9 else INK
+            return VGroup(box, MathTex(label, font_size=46, color=ink).move_to(box))
 
         example = VGroup(
             piece(0, 0.6, AMBER, 0.9, r"\tfrac14"),
@@ -400,32 +372,42 @@ class WhereTheProofUsesIt(Explainer):
 
     # ----------------------------------------------------- hecke compatibility
     def hecke_compatibility(self):
-        icon_a = grid_icon("A", 1.2).move_to(p2(-5.0, 2.2))
-        icon_b = grid_icon("B", 1.2).move_to(p2(-2.2, 2.2))
-        f_a = MathTex("f(A)=2", font_size=38, color=AMBER).next_to(
-            icon_a, DOWN, buff=0.2
+        destinations = VGroup(*(grid_icon(label) for label in "ABB"))
+        destinations.arrange(RIGHT, buff=0.65).move_to(p2(-3.55, 1.6))
+        row_tag = Text("Neighbours of A", font_size=27).next_to(
+            destinations, UP, buff=0.25
         )
-        f_b = MathTex("f(B)=-3", font_size=38, color=BLUE).next_to(
-            icon_b, DOWN, buff=0.2
-        )
-        g_a = MathTex(
-            "g(A)", "=", "2", "+", "(-3)", "+", "(-3)", "=", "-4", font_size=42
-        ).move_to(p2(-3.6, 0.35))
-        for index, color in ((2, AMBER), (4, BLUE), (6, BLUE), (8, GLOW)):
-            g_a[index].set_color(color)
-        example_tag = Text("the part 1 example", font_size=22, color=DIM).next_to(
-            g_a, DOWN, buff=0.15
-        )
+
+        def values(numbers):
+            return VGroup(
+                *[
+                    MathTex(str(n), font_size=46, color=color).next_to(
+                        chip, DOWN, buff=0.24
+                    )
+                    for chip, n, color in zip(
+                        destinations, numbers, [AMBER, BLUE, BLUE]
+                    )
+                ]
+            )
+
+        indicators, samples = values([0, 1, 1]), values([2, -3, -3])
+        entry = MathTex(r"0+1+1=2", font_size=47).move_to(p2(-3.55, -0.60))
+        output = MathTex(r"g(A)=2-3-3=-4", font_size=47).move_to(entry)
         self.say(
-            "In part 1, mixing the values 2 and −3 forced the new value\n"
-            "at A: the sum over A's neighbours, 2 − 3 − 3 = −4.",
+            "Keep A’s three neighbours in view. Counting the B destinations\n"
+            "gives the matrix entry 2.",
             *self.chapter("Hecke becomes a compatibility condition"),
-            FadeIn(icon_a),
-            FadeIn(icon_b),
-            FadeIn(f_a),
-            FadeIn(f_b),
-            FadeIn(g_a),
-            FadeIn(example_tag),
+            FadeIn(destinations),
+            FadeIn(row_tag),
+            FadeIn(indicators),
+            FadeIn(entry),
+        )
+        self.read()
+        self.say(
+            "Now read the function at the same neighbours. Its values are\n"
+            "2, −3 and −3. They give the new value at A, which is −4.",
+            ReplacementTransform(indicators, samples),
+            ReplacementTransform(entry, output),
         )
         self.read()
 
@@ -451,8 +433,8 @@ class WhereTheProofUsesIt(Explainer):
             "for every certified local input", font_size=24, color=INK
         ).move_to(p2(3.5, 0.45))
         self.say(
-            "HeckeAt states that requirement in general: the target readout g\n"
-            "equals the normalized neighbour sum of f, for every certified input.",
+            "HeckeAt requires the target value to agree with the normalized\n"
+            "neighbour sum for every certified local input.",
             FadeIn(card),
             FadeIn(card_title),
             FadeIn(condition),
@@ -467,7 +449,7 @@ class WhereTheProofUsesIt(Explainer):
                 corner_radius=0.15,
                 stroke_color=DIM,
                 stroke_width=2.5,
-            ).move_to(p2(x, -1.6))
+            ).move_to(p2(x, 0.5))
             title = Text(label, font_size=22, color=INK).next_to(frame, UP, buff=0.12)
             equality = VGroup(
                 MathTex(r"g=\text{normalized sum of }f", font_size=36, color=BLUE),
@@ -488,10 +470,10 @@ class WhereTheProofUsesIt(Explainer):
             stroke_width=5,
         )
         carry_tag = mono("heckeTieT", 16, GLOW).next_to(carry, UP, buff=0.08)
+        self.clear_stage()
         self.say(
-            "heckeTieT carries that condition from the original setup to a\n"
-            "copied setup used in the series construction.",
-            FadeOut(example_tag),
+            "The series construction copies the setup. The lemma heckeTieT\n"
+            "carries the same equality across to the copy.",
             FadeIn(frame_a),
             FadeIn(title_a),
             FadeIn(equality_a),
@@ -499,12 +481,7 @@ class WhereTheProofUsesIt(Explainer):
             FadeIn(title_b),
         )
         self.play(Create(carry), FadeIn(carry_tag), run_time=0.7)
-        self.play(FadeIn(equality_b, shift=0.4 * RIGHT), run_time=0.8)
-        self.read()
-        self.say(
-            "The same equality holds in both. In the proof, the Hecke sum\n"
-            "specifies a readout that survives transport."
-        )
+        self.play(TransformFromCopy(equality_a, equality_b), run_time=1.2)
         self.read()
         self.clear_stage()
 
@@ -514,7 +491,7 @@ class WhereTheProofUsesIt(Explainer):
         take_mass = lines("Mass identifies\na volume", 32, AMBER, buff=0.14)
         take_mass.next_to(mass_card, UP, buff=0.4)
         take_hecke = lines(
-            "Hecke specifies a readout\nthat survives transport", 32, BLUE, buff=0.14
+            "The copied setup preserves\nthe Hecke condition", 32, BLUE, buff=0.14
         ).next_to(hecke_card, UP, buff=0.4)
         where_mass = mono("volumes_eq_masses_of_unfold", 16, DIM).next_to(
             mass_card, DOWN, buff=0.25
@@ -523,9 +500,9 @@ class WhereTheProofUsesIt(Explainer):
             hecke_card, DOWN, buff=0.25
         )
         split = lines(
-            "The proof applies both formulas to its own data.\n"
-            "This repository makes them executable, and tests them\n"
-            f"on {FIXTURE_COUNT} shared cases in Lean, C and Rust.",
+            "The formalization uses its own data.\n"
+            f"Lean generates {FIXTURE_COUNT} finite-table examples\n"
+            "for the C and Rust tests.",
             26,
             INK,
             buff=0.16,
@@ -539,8 +516,8 @@ class WhereTheProofUsesIt(Explainer):
         )
         self.read()
         self.say(
-            "The other specifies a readout, and that specification\n"
-            "survives transport between setups.",
+            "The other specifies the value of a transformed form.\n"
+            "The same condition holds in the copied setup.",
             FadeIn(take_hecke),
             FadeIn(hecke_card),
             FadeIn(where_hecke),

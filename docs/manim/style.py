@@ -1,5 +1,9 @@
 """Shared palette, text helpers and narration scaffold for the documentation animations."""
 
+import os
+from html import escape
+from pathlib import Path
+
 from manim import (
     DOWN,
     LEFT,
@@ -100,9 +104,17 @@ class Explainer(Scene):
         self.heading = None
         self._said_at = 0.0
         self._reading_time = 0.0
+        self._chapter_title = "Opening"
+        self._cues = []
+        self._poster_time = None
+
+    def mark_poster(self):
+        """Pick a fully composed frame for the README thumbnail."""
+        self._poster_time = self.time
 
     def chapter(self, text: str):
         """Replace the small heading in the top-left corner."""
+        self._chapter_title = text
         new = Text(text, font_size=20, color=DIM).to_corner(UP + LEFT, buff=0.3)
         animations = [FadeIn(new)]
         if self.heading is not None:
@@ -120,9 +132,47 @@ class Explainer(Scene):
             # Clear the old line first so two captions never overlap.
             self.play(FadeOut(self.subtitle), run_time=0.2)
         self.subtitle = new
+        self._cues.append((self.time, self._chapter_title, text))
         self.play(FadeIn(new, shift=0.1 * UP), *animations, run_time=run_time)
         self._said_at = self.time
         self._reading_time = 0.8 + SECONDS_PER_WORD * len(text.split())
+
+    def tear_down(self):
+        """Write playback companions when building a complete release video."""
+        export = os.environ.get("EXPLAINER_EXPORT_PREFIX")
+        if not export:
+            return
+        if self._poster_time is None:
+            raise ValueError("The scene needs a poster frame")
+        prefix = Path(export)
+        title = prefix.name.replace("_", " ").capitalize()
+        vtt = ["WEBVTT", ""]
+        transcript = [f"# {title}", ""]
+        chapter = None
+
+        def timestamp(seconds):
+            minutes, ms = divmod(round(1000 * seconds), 60_000)
+            hours, minutes = divmod(minutes, 60)
+            return f"{hours:02}:{minutes:02}:{ms // 1000:02}.{ms % 1000:03}"
+
+        ends = [start for start, _, _ in self._cues[1:]] + [self.time]
+        for (start, heading, text), end in zip(self._cues, ends, strict=True):
+            vtt.extend([f"{timestamp(start)} --> {timestamp(end)}", escape(text), ""])
+            if heading != chapter:
+                minute, second = divmod(int(start), 60)
+                transcript.extend(
+                    [
+                        f"## {heading}",
+                        "",
+                        f"[{minute}:{second:02} in the video]({prefix.name}.mp4#t={start:.3f})",
+                        "",
+                    ]
+                )
+                chapter = heading
+            transcript.extend([" ".join(text.splitlines()), ""])
+        prefix.with_suffix(".vtt").write_text("\n".join(vtt), encoding="utf-8")
+        prefix.with_suffix(".md").write_text("\n".join(transcript), encoding="utf-8")
+        prefix.with_suffix(".poster-time").write_text(f"{self._poster_time:.3f}\n")
 
     def read(self, extra: float = 0.0):
         """Wait until the current subtitle has been on screen long enough to read."""

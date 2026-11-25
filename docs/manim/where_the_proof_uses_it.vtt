@@ -1,0 +1,64 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:06.200
+We followed two chains of references from the declaration
+named riemannHypothesis in Alpöge’s Lean source.
+
+00:00:06.200 --> 00:00:15.300
+In the proof, the first enters a volume identity and the second
+a compatibility condition. This video follows each one in.
+
+00:00:15.300 --> 00:00:23.867
+In the definition of HeckeAt, rd g is the value being specified.
+On the right, ρ.hecke applies the Hecke operator to rd f.
+
+00:00:23.867 --> 00:00:31.267
+That reference gives one edge from HeckeAt to Setup.hecke.
+Watch where it sits in the two paths we traced.
+
+00:00:31.267 --> 00:00:39.467
+The highlighted reference ends the blue path. Both paths start
+at riemannHypothesis and share their first eight links.
+
+00:00:39.467 --> 00:00:47.367
+The two paths shown have 15 and 19 links. What does
+each definition contribute to the argument?
+
+00:00:47.367 --> 00:00:54.167
+In part 1, the masses of A and B filled a bar:
+1/4 + 1/6 = 5/12.
+
+00:00:54.167 --> 00:01:03.367
+The proof has the same picture with its own data: a volume cut
+into one piece per double-coset class, each of size 1 ÷ d.
+
+00:01:03.367 --> 00:01:09.867
+The theorem volumes_eq_masses_of_unfold uses that decomposition:
+the volume equals the sum of the reciprocal symmetry orders.
+
+00:01:09.867 --> 00:01:15.433
+That sum is classMass. In the proof, mass identifies a volume.
+
+00:01:15.433 --> 00:01:21.633
+Keep A’s three neighbours in view. Counting the B destinations
+gives the matrix entry 2.
+
+00:01:21.633 --> 00:01:30.833
+Now read the function at the same neighbours. Its values are
+2, −3 and −3. They give the new value at A, which is −4.
+
+00:01:30.833 --> 00:01:38.233
+HeckeAt requires the target value to agree with the normalized
+neighbour sum for every certified local input.
+
+00:01:38.233 --> 00:01:45.633
+The series construction copies the setup. The lemma heckeTieT
+carries the same equality across to the copy.
+
+00:01:45.633 --> 00:01:51.533
+So that is where the two sums enter the proof.
+One identifies a volume.
+
+00:01:51.533 --> 00:02:03.833
+The other specifies the value of a transformed form.
+The same condition holds in the copied setup.

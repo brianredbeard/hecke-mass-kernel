@@ -362,6 +362,7 @@ class WhatTheKernelComputes(Explainer):
             FadeIn(right_answer),
             run_time=0.8,
         )
+        self.mark_poster()
         self.read()
         merged = MathTex("-2", font_size=110, color=GLOW).move_to(p2(0, -1.55))
         self.say(
@@ -526,20 +527,26 @@ class WhatTheKernelComputes(Explainer):
         lost = VGroup(
             *[marks[bits] for bits in groups[4]], copies[4], symmetries[4], weights[4]
         )
-        short = MathTex(r"3", font_size=54, color=WARN).move_to(total)
+        comparison = MathTex(
+            r"\text{found }3", "<", r"\text{expected }4", font_size=42
+        ).move_to(p2(3.4, -2.2))
+        comparison[0].set_color(WARN)
         self.say(
-            "Miss one pattern and the total falls short: 3, not 4.\n"
-            "So the mass can certify that a list is complete.",
+            "Leave out this pattern and its weight disappears. The list now\n"
+            "accounts for only 3 of the expected mass of 4.",
             FadeOut(lost),
-            Transform(total, short),
-            known.animate.set_color(DIM),
+            FadeOut(total_label),
+            FadeOut(total),
+            FadeOut(known),
+            FadeIn(comparison),
         )
         self.read()
-        restored = MathTex("4", font_size=54, color=GLOW).move_to(total)
         self.play(
             FadeIn(lost),
-            Transform(total, restored),
-            known.animate.set_color(GLOW),
+            FadeOut(comparison),
+            FadeIn(total_label),
+            FadeIn(total),
+            FadeIn(known),
             run_time=0.6,
         )
         card = code_card("class_mass([4, 4, 2, 1, 1, 1])  →  4", 24).move_to(
@@ -653,14 +660,20 @@ class WhatTheKernelComputes(Explainer):
     # ------------------------------------------------- what a neighbour is
     def neighbours_from_lattice(self):
         big = lattice(spacing=0.48).move_to(p2(0, 0.7))
-        tag = Text("a lattice: a repeating grid of points", font_size=24, color=DIM)
+        origin = Square(side_length=0.4, color=GLOW, stroke_width=3).move_to(big)
+        origin_label = MathTex(r"(0,0)", font_size=34, color=GLOW).next_to(
+            big, DOWN, buff=0.18
+        )
+        tag = Text("integer lattice", font_size=24, color=DIM)
         tag.move_to(p2(0, 2.9))
         self.say(
-            "What happens when we transform one of these objects? A neighbour\n"
-            "is a new object built from an old one. Picture a grid of points.",
+            "To picture a neighbour, start with an integer lattice.\n"
+            "The marked point is the origin, with coordinates (0, 0).",
             *self.chapter("Part 2 of 4: mixing over neighbours"),
             FadeIn(tag),
             LaggedStart(*[FadeIn(d, scale=0.5) for d in big], lag_ratio=0.01),
+            Create(origin),
+            FadeIn(origin_label),
             run_time=1.2,
         )
         self.read()
@@ -673,13 +686,30 @@ class WhatTheKernelComputes(Explainer):
         )
         step = Text("keep half", font_size=20, color=DIM).next_to(arrow, UP, buff=0.1)
         self.say(
-            "The prime sets the size of the step. At the prime 2: keep exactly\n"
-            "half the points, so that what remains is still a regular grid.",
+            "At the prime 2, keep half the lattice, including the origin.\n"
+            "The sum of any two retained points must also be retained.",
             FadeOut(tag),
+            FadeOut(origin_label),
             big.animate.scale(0.3 / 0.48).move_to(p2(xs[0], top_y)),
+            origin.animate.scale(0.3 / 0.48).move_to(p2(xs[0], top_y)),
             FadeIn(original),
             FadeIn(arrow),
             FadeIn(step),
+        )
+        self.read()
+
+        odd = lattice(lambda u, v: u % 2 == 1, WARN).move_to(p2(xs[1], top_y))
+        missing_origin = origin.copy().set_color(WARN).set_fill(BG, opacity=1)
+        missing_origin.move_to(odd)
+        odd_label = Text("odd columns", font_size=24, color=WARN).next_to(
+            odd, DOWN, buff=0.24
+        )
+        self.say(
+            "Try the odd columns. Their spacing is regular, but the origin\n"
+            "falls in the gap. This choice fails the sublattice test.",
+            FadeIn(odd),
+            FadeIn(odd_label),
+            Create(missing_origin),
         )
         self.read()
 
@@ -691,17 +721,21 @@ class WhatTheKernelComputes(Explainer):
         ):
             grid = lattice(lambda u, v, a=a, b=b: (a * u + b * v) % 2 == 0, color)
             grid.move_to(p2(x, top_y))
+            kept_origin = origin.copy().move_to(grid)
             label = Text(name, font_size=24, color=color).move_to(p2(x, -0.45))
             rule = MathTex(formula + r"\pmod 2", font_size=32, color=INK).move_to(
                 p2(x, -1.0)
             )
-            panels.add(VGroup(grid, label, rule))
+            panels.add(VGroup(grid, kept_origin, label, rule))
         heading = Text("exactly three ways", font_size=30, color=INK).move_to(
             p2(1.7, 2.75)
         )
         self.say(
-            "There are exactly three ways to do it: every other column,\n"
-            "every other row, or the checkerboard.",
+            "Three index-two sublattices qualify. Each keeps the origin and\n"
+            "satisfies one of these parity rules.",
+            FadeOut(odd),
+            FadeOut(odd_label),
+            FadeOut(missing_origin),
             LaggedStart(*[FadeIn(panel) for panel in panels], lag_ratio=0.5),
             FadeIn(heading),
             run_time=2.2,
@@ -713,8 +747,8 @@ class WhatTheKernelComputes(Explainer):
             DIM,
         ).move_to(p2(0, -1.85))
         self.say(
-            "These three grids are the neighbours of the original at the prime 2.\n"
-            "They are not picked by hand: no other choice works.",
+            "The left grid models one prime. Each parity rule picks out\n"
+            "one of its three neighbours at the prime 2.",
             FadeIn(model),
         )
         self.read()
@@ -1003,6 +1037,7 @@ class WhatTheKernelComputes(Explainer):
         self.say(
             "Now turn the arrows into numbers. Each class has its list of\n"
             "three neighbours, already sorted into classes.",
+            *self.chapter("The Brandt matrix"),
             FadeIn(node_a),
             FadeIn(node_b),
         )
@@ -1242,29 +1277,37 @@ class WhatTheKernelComputes(Explainer):
             FadeIn(self.balanced, shift=0.2 * UP),
         )
         self.read()
-        forced = MathTex(
-            r"\tfrac14\,a=\tfrac16\,b",
-            r"\;\Longrightarrow\;",
-            "3a=2b",
-            r"\;\Longrightarrow\;",
-            r"a=2,\ b=3",
-            font_size=46,
+        bounds = MathTex(
+            r"3n_{AB}=2n_{BA},\qquad 0\le n_{AB},n_{BA}\le 3",
+            font_size=37,
             color=INK,
-        ).move_to(p2(0, -1.95))
-        forced[4].set_color(GLOW)
+        ).move_to(p2(0, -1.55))
+        choices = MathTex(
+            r"(n_{AB},n_{BA})\in\{",
+            r"(0,0)",
+            ",",
+            r"(2,3)",
+            r"\}",
+            font_size=40,
+            color=INK,
+        ).move_to(p2(0, -2.14))
         self.say(
-            "Every table of this kind balances like that. Call the crossing\n"
-            "arrows a and b: with at most 3 each, only a = 2, b = 3 fits.",
-            FadeIn(forced),
+            "Call the two crossing counts n_AB and n_BA. Each has to be a\n"
+            "whole number from 0 to 3. Two pairs satisfy the balance equation.",
+            FadeIn(bounds),
+            FadeIn(choices),
         )
         self.read()
+        strike = Line(choices[1].get_left(), choices[1].get_right(), color=WARN)
         self.say(
-            "So once the two classes are connected at all, the masses\n"
-            "leave no other graph: one loop at A, none at B.",
-            Indicate(loop, color=GLOW),
+            "The table has an edge from A to B. That rules out (0, 0).\n"
+            "The crossing counts must be 2 and 3, leaving one loop at A.",
+            Indicate(forth, color=GLOW),
+            Create(strike),
+            choices[3].animate.set_color(GLOW),
         )
         self.read()
-        self.play(FadeOut(forced), run_time=0.4)
+        self.play(FadeOut(bounds), FadeOut(choices), FadeOut(strike), run_time=0.4)
 
     # ----------------------------------------------------- derive eigenvector
     def derive_eigenvector(self):
@@ -1326,103 +1369,79 @@ class WhatTheKernelComputes(Explainer):
 
     # --------------------------------------------------------- apply operator
     def apply_operator(self):
-        value_a = MathTex(str(MODE[0]), font_size=72, color=AMBER).next_to(
-            self.icon_a, LEFT, buff=0.4
-        )
-        value_b = MathTex(str(MODE[1]), font_size=72, color=BLUE).next_to(
-            self.icon_b, RIGHT, buff=0.4
-        )
+        self.clear_stage()
+
+        def destination_row(source, y):
+            row = VGroup(*[chip(name, 0.75) for name in source.neighbours])
+            row.arrange(RIGHT, buff=0.7).move_to(p2(0, y))
+            label = Text(f"From {source.name}", font_size=31, color=INK)
+            label.next_to(row, LEFT, buff=0.8)
+            return row, label
+
+        def chip_values(row, values):
+            labels = VGroup()
+            for tile, value in zip(row, values):
+                labels.add(
+                    MathTex(str(value), font_size=45).next_to(tile, DOWN, buff=0.13)
+                )
+            return labels
+
+        a, b = CLASSES
+        row_a, label_a = destination_row(a, 2.15)
+        indicator = chip_values(row_a, [int(name == "B") for name in a.neighbours])
+        answer = MathTex(rf"= {MATRIX[0][1]}", font_size=62, color=BLUE)
+        answer.next_to(row_a, RIGHT, buff=0.6)
+        role = Text("matrix entry", font_size=24, color=BLUE).next_to(answer, DOWN)
         self.say(
-            "With two classes that is a single line of patterns, so mixing\n"
-            "can only scale it. By how much? Try 2 on A and −3 on B.",
-            FadeOut(self.balanced),
-            FadeOut(self.derivation),
-            FadeOut(self.preserved),
-            FadeOut(self.mass_a),
-            FadeOut(self.mass_b),
-            FadeIn(value_a, scale=1.4),
-            FadeIn(value_b, scale=1.4),
+            "Keep A’s three destinations in place. Counting arrivals at B gives\n"
+            "0 + 1 + 1 = 2, one entry in the matrix.",
+            FadeIn(row_a),
+            FadeIn(label_a),
+            FadeIn(indicator),
+            FadeIn(answer),
+            FadeIn(role),
         )
         self.read()
 
-        def travel(source, target_icon, count):
-            flyers = VGroup(*[source.copy() for _ in range(count)])
-            self.add(flyers)
-            self.play(
-                LaggedStart(
-                    *[
-                        f.animate.scale(0.6).move_to(
-                            target_icon.get_bottom() + 0.45 * DOWN + 0.5 * i * RIGHT
-                        )
-                        for i, f in enumerate(flyers, start=-(count - 1) // 2)
-                    ],
-                    lag_ratio=0.25,
-                ),
-                run_time=1.0,
-            )
-            return flyers
-
-        row_a = MathTex(
-            r"\text{new A}",
-            "=",
-            "2",
-            "+",
-            "(-3)",
-            "+",
-            "(-3)",
-            "=",
-            str(MIXED[0]),
-            font_size=48,
-            color=INK,
-        ).move_to(p2(-3.3, -0.6))
-        for index, color in ((2, AMBER), (4, BLUE), (6, BLUE)):
-            row_a[index].set_color(color)
-        row_a[8].set_color(GLOW)
-        row_b = MathTex(
-            r"\text{new B}",
-            "=",
-            "2",
-            "+",
-            "2",
-            "+",
-            "2",
-            "=",
-            str(MIXED[1]),
-            font_size=48,
-            color=INK,
-        ).move_to(p2(3.3, -0.6))
-        for index in (2, 4, 6):
-            row_b[index].set_color(AMBER)
-        row_b[8].set_color(GLOW)
-        self.say(
-            "A's neighbours are A, B, B: 2 − 3 − 3 = −4.\n"
-            "B's neighbours are A, A, A: 2 + 2 + 2 = 6."
+        values = dict(zip((a.name, b.name), MODE))
+        new_values = chip_values(row_a, [values[name] for name in a.neighbours])
+        new_answer = MathTex(rf"= {MIXED[0]}", font_size=62, color=GLOW).move_to(answer)
+        new_role = Text("output at A", font_size=24, color=GLOW).next_to(
+            new_answer, DOWN
         )
-        to_a = travel(value_b, self.icon_a, 2)
-        self.play(FadeOut(to_a), FadeIn(row_a), run_time=0.5)
-        to_b = travel(value_a, self.icon_b, 3)
-        self.play(FadeOut(to_b), FadeIn(row_b), run_time=0.5)
+        self.say(
+            "Now give A the value 2 and B the value −3. On the same three\n"
+            "destinations, the new values add to −4. That is the output at A.",
+            Transform(indicator, new_values),
+            Transform(answer, new_answer),
+            Transform(role, new_role),
+        )
         self.read()
 
-        outcome = MathTex(
-            "(2,\\,-3)",
-            r"\;\longmapsto\;",
-            "(-4,\\,6)",
-            r"\;=\;",
-            "-2",
-            r"\,\times\,",
-            "(2,\\,-3)",
-            font_size=60,
-            color=INK,
-        ).move_to(p2(0, -1.85))
-        outcome[4].set_color(GLOW)
-        ring = SurroundingRectangle(outcome[4], color=GLOW, buff=0.12)
+        row_b, label_b = destination_row(b, 0.23)
+        values_b = chip_values(row_b, [values[name] for name in b.neighbours])
+        answer_b = MathTex(rf"= {MIXED[1]}", font_size=62, color=GLOW)
+        answer_b.next_to(row_b, RIGHT, buff=0.6)
+        role_b = Text("output at B", font_size=24, color=GLOW).next_to(answer_b, DOWN)
         self.say(
-            "The pattern keeps its shape, reverses sign and doubles: × −2.\n"
-            "That factor is the Hecke eigenvalue at the prime 2.",
-            FadeIn(outcome, shift=0.2 * UP),
+            "From B, all three neighbours land on A, so the second output is 6.\n"
+            "Compare the entire output vector with the one we put in.",
+            FadeIn(row_b),
+            FadeIn(label_b),
+            FadeIn(values_b),
+            FadeIn(answer_b),
+            FadeIn(role_b),
         )
-        self.play(Create(ring), run_time=0.5)
+        self.read()
+
+        outcome = MathTex(r"(-4,\,6)", "=", "-2", r"(2,\,-3)", font_size=64)
+        outcome.move_to(p2(0, -1.45))
+        outcome[2].set_color(GLOW)
+        self.say(
+            "Both coordinates are multiplied by −2. This common scale factor\n"
+            "is the Hecke eigenvalue at the prime 2.",
+            FadeIn(outcome),
+        )
         self.read(0.5)
         self.clear_stage()
 
@@ -1440,7 +1459,7 @@ class WhatTheKernelComputes(Explainer):
         self.say(
             "Now the other side: an equation that appears to have\n"
             "nothing to do with our neighbour graph.",
-            *self.chapter("Part 3 of 4: the equation"),
+            *self.chapter("Part 3 of 4: counting points on the curve"),
             FadeIn(self.memory),
             FadeIn(equation, shift=0.2 * UP),
         )
@@ -1680,113 +1699,142 @@ class WhatTheKernelComputes(Explainer):
 
     # ----------------------------------------------------------- architecture
     def architecture(self):
-        def flow(boxes, labels, y):
-            arrows = VGroup()
-            for (a, b), label in zip(zip(boxes, boxes[1:]), labels):
-                arrow = Arrow(
-                    a.get_right(), b.get_left(), color=INK, stroke_width=4, buff=0.08
-                )
-                tag = Text(label, font_size=18, color=INK).next_to(arrow, UP, buff=0.06)
-                arrows.add(VGroup(arrow, tag))
-            return arrows
+        a, b = CLASSES
+        rows = [item.neighbours for item in CLASSES]
+        unique = [tuple(dict.fromkeys(row)) for row in rows]
+        weights = [item.mass / MASS for item in CLASSES]
+        forward, reverse = (
+            Fraction(row.count(target), len(row))
+            for row, target in zip(rows, (b.name, a.name))
+        )
+        faulty_forward, faulty_reverse = (
+            Fraction(row.count(target), len(row))
+            for row, target in zip(unique, (b.name, a.name))
+        )
+        assert weights == [Fraction(3, 5), Fraction(2, 5)]
+        assert weights[0] * forward == weights[1] * reverse == Fraction(2, 5)
+        assert weights[0] * faulty_forward == Fraction(3, 10)
+        assert weights[1] * faulty_reverse == Fraction(2, 5)
 
-        run_title = Text("at run time", font_size=24, color=DIM).move_to(p2(-5.7, 3.1))
-        run_boxes = [
-            panel("Workbench", "discovers classes\nand neighbours", DIM),
-            panel("Kernel", "exact rational\narithmetic", GLOW),
-            panel("Caller", "assembles tables,\nanalyses them", DIM),
-        ]
-        for box_, x in zip(run_boxes, (-4.9, 0, 4.9)):
-            box_.move_to(p2(x, 1.85))
-        run_flow = flow(run_boxes, ("finite lists", "fractions"), 1.85)
+        def vertex(item, j, weight, x):
+            icon = grid_icon(item.name, 0.95).move_to(p2(x, 1.8))
+            point = MathTex(f"j={j}", font_size=36).next_to(icon, UP, buff=0.15)
+            label = Text(f"weight {weight}", font_size=25).next_to(
+                icon, DOWN, buff=0.15
+            )
+            tiles = VGroup(*[chip(name, 0.5) for name in item.neighbours])
+            tiles.arrange(RIGHT, buff=0.1).move_to(p2(x, 0.05))
+            return icon, point, label, tiles
+
+        icon_a, point_a, label_a, chips_a = vertex(a, 1, weights[0], -4.8)
+        icon_b, point_b, label_b, chips_b = vertex(b, 0, weights[1], 4.8)
+        title = Text("Checking a supersingular isogeny graph", font_size=34).move_to(
+            p2(0, 3.0)
+        )
         self.say(
-            "The software mirrors that split. A workbench discovers classes\n"
-            "and neighbours. The kernel only does exact arithmetic.",
+            "We used Gross’s table at level 11. The Rust example finds these edges\n"
+            "independently from the roots of a modular polynomial modulo 11.",
             *self.chapter("Part 4 of 4: the software"),
-            FadeIn(run_title),
-            *[FadeIn(b) for b in run_boxes],
-            FadeIn(run_flow),
-        )
-        self.read()
-        self.say(
-            "It cannot tell whether a list is genuine or complete.\n"
-            "That evidence has to travel with the list, from upstream.",
-            Indicate(run_boxes[0][0], color=WARN, scale_factor=1.04),
+            FadeIn(title),
+            FadeIn(icon_a),
+            FadeIn(icon_b),
+            FadeIn(point_a),
+            FadeIn(point_b),
+            FadeIn(chips_a),
+            FadeIn(chips_b),
         )
         self.read()
 
-        dev_title = Text("at development time", font_size=24, color=DIM).move_to(
-            p2(-5.1, 0.35)
-        )
-        dev_boxes = [
-            panel("Lean", "definitions\nand proofs", CURVE),
-            panel("Fixtures", f"{FIXTURE_COUNT} cases with\nexact answers", INK),
-            panel("C and Rust", "conformance\ntests", INK),
-        ]
-        for box_, x in zip(dev_boxes, (-4.9, 0, 4.9)):
-            box_.move_to(p2(x, -0.95))
-        dev_flow = flow(dev_boxes, ("generates", "checked by"), -0.95)
+        def flow(weight, probability, color, y):
+            return MathTex(
+                rf"{weight}\ \times\ {probability}\ =\ {weight * probability}",
+                font_size=43,
+                color=color,
+            ).move_to(p2(0, y))
+
+        forth = Arrow(p2(-3.5, 1.55), p2(3.5, 1.55), color=AMBER, buff=0)
+        back = Arrow(p2(3.5, 0.85), p2(-3.5, 0.85), color=BLUE, buff=0)
+        flow_a = flow(weights[0], forward, AMBER, 1.98)
+        flow_b = flow(weights[1], reverse, BLUE, 0.37)
+        formula = Text(
+            "flow = vertex weight × chance of crossing", font_size=27
+        ).move_to(p2(0, -1.08))
         self.say(
-            "Lean, a proof assistant, defines both operations, proves\n"
-            f"specified properties and generates {FIXTURE_COUNT} test cases.",
-            FadeIn(dev_title),
-            FadeIn(dev_boxes[0]),
-            FadeIn(dev_boxes[1]),
-            FadeIn(dev_flow[0]),
+            "Divide each mass by 5/12 to get its share. Starting at A, two of\n"
+            "three edges cross. From B, all cross. The flows agree at 2/5.",
+            FadeIn(label_a),
+            FadeIn(label_b),
+            Create(forth),
+            Create(back),
+            FadeIn(flow_a),
+            FadeIn(flow_b),
+            FadeIn(formula),
         )
         self.read()
+        wrong = flow(weights[0], faulty_forward, WARN, 1.98)
         self.say(
-            "The C and Rust libraries are tested against every case:\n"
-            "conformance to one definition, not a proof of C or Rust.",
-            FadeIn(dev_boxes[2]),
-            FadeIn(dev_flow[1]),
+            "Now export each destination just once. From A, the chance of crossing\n"
+            "drops to one half. The flows disagree: 3/10 one way, 2/5 the other.",
+            FadeOut(chips_a[2]),
+            FadeOut(chips_b[1]),
+            FadeOut(chips_b[2]),
+            Transform(flow_a, wrong),
+        )
+        self.read()
+        self.play(FadeOut(formula), run_time=0.35)
+        command = code_card(
+            "cargo run --locked --manifest-path examples/rust/Cargo.toml --example isogeny_graph",
+            size=17,
+        ).move_to(p2(0, -1.15))
+        if command.width > 13.1:
+            command.scale_to_fit_width(13.1)
+        self.say(
+            "Run this example from the repository root. The kernel evaluates the\n"
+            "supplied lists exactly. The balance check exposes the lost edges.",
+            FadeIn(command),
         )
         self.read(0.5)
         self.clear_stage()
 
     # ---------------------------------------------------------------- closing
     def closing(self):
-        title = Text(
-            "Two small operations. One deep connection.", font_size=44, color=INK
-        ).move_to(p2(0, 3.0))
+        title = Text("From a table entry to an eigenvalue", font_size=42, color=INK)
+        title.move_to(p2(0, 3.0))
         mass_card, hecke_card = handoff_cards()
-        result = MathTex(
-            r"\text{scale factor at 2}",
-            "=",
-            r"\text{baseline}-\text{point count at 2}",
-            "=",
-            "-2",
-            font_size=46,
-            color=INK,
-        ).move_to(p2(0, 0.05))
-        result[0].set_color(BLUE)
-        result[2].set_color(CURVE)
-        result[4].set_color(GLOW)
-        frame = SurroundingRectangle(
-            result, color=GLOW, buff=0.3, corner_radius=0.15, stroke_width=3
+        mass_label = Text("total class mass", font_size=26, color=AMBER).next_to(
+            mass_card, DOWN
         )
-        stack = Text(
-            "Lean specification  ·  exact rational arithmetic  ·  C and Rust",
-            font_size=26,
-            color=DIM,
-        ).move_to(p2(0, -1.05))
-        question = Text(
-            "Next: where do these two sums enter the Lean proof?",
-            font_size=32,
-            color=GLOW,
-        ).move_to(p2(0, -1.85))
+        entry_label = Text(
+            "one matrix entry: A to B", font_size=26, color=BLUE
+        ).next_to(hecke_card, DOWN)
+        result = MathTex(
+            r"\underbrace{(-4,\,6)}_{\text{whole output}}",
+            "=",
+            r"\underbrace{-2}_{\text{eigenvalue}}",
+            r"(2,\,-3)",
+            font_size=53,
+        ).move_to(p2(0, -0.35))
+        result[2].set_color(GLOW)
         self.say(
-            "The kernel does not find the classes or prove the connection.\n"
-            "It computes the exact arithmetic those results rest on.",
+            "Counting B destinations gives the entry 2. Mixing the whole vector\n"
+            "gives the factor −2, the same number we found by counting points.",
             *self.chapter("Recap"),
             FadeIn(title),
             FadeIn(mass_card),
             FadeIn(hecke_card),
+            FadeIn(mass_label),
+            FadeIn(entry_label),
             FadeIn(result),
-            Create(frame),
-            FadeIn(stack),
-            run_time=1.2,
         )
         self.read()
-        self.play(FadeIn(question, shift=0.2 * UP), run_time=0.6)
-        self.wait(3.5)
+        verification = Text(
+            f"Lean generates {FIXTURE_COUNT} fixtures. C and Rust replay them.",
+            font_size=28,
+            color=INK,
+        ).move_to(p2(0, -1.72))
+        self.say(
+            "Lean proves properties of the arithmetic on supplied tables.\n"
+            "The next film traces the two formulas through Alpöge’s Lean source.",
+            FadeIn(verification),
+        )
+        self.read(1.0)
