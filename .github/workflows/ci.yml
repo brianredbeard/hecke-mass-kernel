@@ -48,6 +48,18 @@ jobs:
       - uses: actions/checkout@v4
       - run: cargo test --manifest-path rust/Cargo.toml
       - run: cargo run --locked --manifest-path examples/rust/Cargo.toml
+      - name: Run practical examples
+        run: |
+          for example in isogeny_graph crystal_mesh telemetry_coverage clifford_twirl compiler_patterns; do
+            cargo run --locked --manifest-path examples/rust/Cargo.toml --example "$example"
+          done
+      - name: Check a spglib mesh export
+        shell: bash
+        run: |
+          python3 -m venv "$RUNNER_TEMP/mesh-venv"
+          "$RUNNER_TEMP/mesh-venv/bin/pip" install spglib==2.7.0
+          "$RUNNER_TEMP/mesh-venv/bin/python" examples/rust/spglib_mesh.py |
+            cargo run --locked --manifest-path examples/rust/Cargo.toml --example crystal_mesh -- --stdin
 
   rvv:
     name: RISC-V Vector fixtures

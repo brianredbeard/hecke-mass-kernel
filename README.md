@@ -44,6 +44,18 @@ cmake --build build/c
 cargo test --manifest-path rust/Cargo.toml
 ```
 
+## Practical examples
+
+The [five runnable examples](examples/rust/README.md) use exact arithmetic
+to catch lost isogeny edges, incorrect crystal-mesh weights, missing telemetry
+fault scenarios, biased quantum noise averages, and incomplete compiler patterns.
+Each runs a correct case and shows the result of introducing one bug. Try the
+isogeny graph from the repository root with Cargo:
+
+```sh
+cargo run --locked --manifest-path examples/rust/Cargo.toml --example isogeny_graph
+```
+
 ## Where this came from
 
 In November 2026, Levent Alpöge released a Lean formalization claiming a
