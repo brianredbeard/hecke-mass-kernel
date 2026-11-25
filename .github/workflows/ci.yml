@@ -55,9 +55,9 @@ jobs:
       - uses: actions/checkout@v4
       - run: cargo test --manifest-path rust/Cargo.toml
       - run: cargo run --locked --manifest-path examples/rust/Cargo.toml
-      - name: Run practical examples
+      - name: Run worked examples
         run: |
-          for example in isogeny_graph crystal_mesh telemetry_coverage clifford_twirl compiler_patterns; do
+          for example in isogeny_graph unitary_hecke crystal_mesh telemetry_coverage clifford_twirl compiler_patterns; do
             cargo run --locked --manifest-path examples/rust/Cargo.toml --example "$example"
           done
       - name: Check a spglib mesh export
