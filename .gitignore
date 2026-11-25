@@ -2,4 +2,10 @@
 /lean/.lake/
 /proof_profile/
 /rust/Cargo.lock
+/.venv/
+/media/
+/.ruff_cache/
 target/
+__pycache__/
+*.pyc
+.DS_Store

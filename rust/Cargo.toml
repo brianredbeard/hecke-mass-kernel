@@ -3,6 +3,7 @@ name = "hecke-mass-kernel"
 version = "0.1.0"
 edition = "2021"
 description = "Exact finite-table class mass and Hecke arithmetic"
+license = "MIT"
 publish = false
 
 [dependencies]
