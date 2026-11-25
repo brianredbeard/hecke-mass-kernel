@@ -2,9 +2,9 @@ import HeckeMassKernel.Finite
 
 open HeckeMassKernel
 
-namespace Phase02Cases
+namespace ReplayedCases
 
--- Orders are counted from the workbench stabilizer lists, with both unit conventions.
+-- Recorded stabilizer orders, with both unit conventions.
 private def masses : List (String × List Nat × String) :=
   [
     ("modular-23-full", [4, 2, 6], "11/12"),
@@ -150,16 +150,41 @@ private def operators : List OperatorCase :=
       [[2, 16], [8, 10]]⟩
   ]
 
-private def frac (num : Int) (den : Nat) (positive : 0 < den := by decide) : Frac :=
-  ⟨num, den, positive⟩
+private def matMul (a b : List (List Nat)) : List (List Nat) :=
+  let cols := (List.range b.length).map (fun j => b.map (fun row => row.getD j 0))
+  a.map (fun row => cols.map (fun col => (row.zip col).foldl (fun acc (x, y) => acc + x * y) 0))
 
--- Named absolute-mass calculations with supplied normalization factors.
-private def presets : List (String × List Frac × String) :=
-  [ ("z12-rank1", [frac 1 12], "1/12"),
-    ("z12-rank2", [frac 1 12, frac 1 24], "1/288"),
-    ("z12-rank3", [frac 1 12, frac 1 24, frac 1 36], "1/10368"),
-    ("zi-rank2", [frac 1 4, frac 1 24, frac 4 1, frac 3 4], "1/32"),
-    ("zi-rank3", [frac 1 4, frac 1 24, frac 1 4], "1/384") ]
+private def checkDetailedBalance (name : String) (orders : List Nat) (matrix : List (List Nat)) :
+    IO Unit := do
+  let n := orders.length
+  unless matrix.length == n do
+    throw (IO.userError s!"{name}: matrix size does not match stabilizer orders")
+  for i in List.range n do
+    let rowI := matrix.getD i []
+    let dI := orders.getD i 0
+    for j in List.range n do
+      let rowJ := matrix.getD j []
+      let dJ := orders.getD j 0
+      let bij := rowI.getD j 0
+      let bji := rowJ.getD i 0
+      unless dJ * bij == dI * bji do
+        throw (IO.userError
+          s!"{name}: detailed balance failed at ({i}, {j}): {dJ}*{bij} ≠ {dI}*{bji}")
+
+private def checkFamily (family : String) (orders : List Nat) (checkPrimeRowSum : Bool) :
+    IO Unit := do
+  let members := operators.filter (fun op => op.name.startsWith family)
+  for op in members do
+    checkDetailedBalance op.name orders op.expected
+    if checkPrimeRowSum then
+      for row in op.expected do
+        let rowSum := row.foldl (· + ·) 0
+        unless rowSum == op.q + 1 do
+          throw (IO.userError s!"{op.name}: expected row sum {op.q + 1}, got {rowSum}")
+  for a in members do
+    for b in members do
+      unless matMul a.expected b.expected == matMul b.expected a.expected do
+        throw (IO.userError s!"{a.name} and {b.name} do not commute")
 
 private def check (name expected : String) (result : Frac) : IO Unit := do
   let actual := result.render
@@ -167,8 +192,9 @@ private def check (name expected : String) (result : Frac) : IO Unit := do
     throw (IO.userError s!"{name}: expected {expected}, got {actual}")
 
 def emit : IO Unit := do
-  for (name, factors, expected) in presets do
-    check name expected (factors.foldl Frac.mul (Frac.integer 1))
+  checkFamily "modular-23-" [4, 2, 6] true
+  checkFamily "modular-37-" [2, 2, 2] true
+  checkFamily "zi-determinant-five-" [16, 8] false
   for (name, orders, expected) in masses do
     check name expected (classMass orders)
     let args := String.intercalate " " (orders.map toString)
@@ -191,4 +217,4 @@ def emit : IO Unit := do
           ([u.render, toString op.q, "0", toString op.rank] ++ samples.map Frac.render)
         IO.println s!"hecke\t{args}\t{expected}"
 
-end Phase02Cases
+end ReplayedCases
