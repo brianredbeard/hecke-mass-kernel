@@ -14,7 +14,7 @@ cmake --build build/c-example
 (cd build/c-example && ctest --output-on-failure)
 ```
 
-Use `find_package(HeckeMass CONFIG REQUIRED)` in the consumer project and link the `HeckeMass::hecke_mass` target. The target supplies the include path for `<hecke_mass/kernel.h>` and links GMP. `hecke_mass_class_mass` accepts an array of GMP integer pointers and `hecke_mass_hecke` accepts a character value, three integer parameters, and a sample array. Both write into a caller-initialized GMP rational. Integer inputs must be nonnegative and rational inputs must be canonical. For library-only builds, configure with `-DBUILD_TESTING=OFF`.
+Use `find_package(HeckeMass CONFIG REQUIRED COMPONENTS FiniteKernel)` in the consumer project and link the `HeckeMass::hecke_mass` target. The target supplies the include path for `<hecke_mass/kernel.h>` and links GMP. `hecke_mass_class_mass_checked` and `hecke_mass_hecke_checked` validate pointers, nonnegative integer inputs, and positive denominators, returning `HECKE_MASS_OK` or `HECKE_MASS_ERR_INVALID_ARGUMENT` without modifying `result` on error. The void wrappers `hecke_mass_class_mass` and `hecke_mass_hecke` delegate to the checked implementations and zero `result` on invalid input. Output aliasing (`result == u` or `result == samples[i]`) is supported. For library-only builds, configure with `-DBUILD_TESTING=OFF`.
 
 ## Rust with Cargo
 

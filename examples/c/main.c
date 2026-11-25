@@ -15,12 +15,12 @@ int main(void)
     mpq_set_si(second, 4, 1);
 
     const mpz_srcptr orders[] = {four, six};
-    hecke_mass_class_mass(result, orders, 2);
-    int mass_ok = mpq_cmp_ui(result, 5, 12) == 0;
+    int mass_ok = hecke_mass_class_mass_checked(result, orders, 2) == HECKE_MASS_OK &&
+                  mpq_cmp_ui(result, 5, 12) == 0;
 
     const mpq_srcptr samples[] = {first, second};
-    hecke_mass_hecke(result, u, q, k, rank, samples, 2);
-    int hecke_ok = mpq_cmp_si(result, -2, 1) == 0;
+    int hecke_ok = hecke_mass_hecke_checked(result, u, q, k, rank, samples, 2) == HECKE_MASS_OK &&
+                   mpq_cmp_si(result, -2, 1) == 0;
 
     mpq_clears(result, u, first, second, NULL);
     mpz_clears(four, six, q, k, rank, NULL);

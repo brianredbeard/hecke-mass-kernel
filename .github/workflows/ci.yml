@@ -31,9 +31,16 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y libgmp-dev
       - name: Build and test portable C
         run: |
-          cmake -S c -B build/c -DCMAKE_BUILD_TYPE=Release
+          cmake -S c -B build/c -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-Wall -Wextra -Werror"
           cmake --build build/c
           ctest --test-dir build/c --output-on-failure
+      - name: Build and test portable C with ASan and UBSan
+        run: |
+          cmake -S c -B build/c-sanitize -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_C_FLAGS="-Wall -Wextra -Werror -fsanitize=address,undefined -fno-omit-frame-pointer" \
+            -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"
+          cmake --build build/c-sanitize
+          ctest --test-dir build/c-sanitize --output-on-failure
       - name: Build and test the standalone CMake consumer
         run: |
           cmake --install build/c --prefix "$RUNNER_TEMP/hecke-mass"

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(hecke_mass_c_example LANGUAGES C)
 
-find_package(HeckeMass CONFIG REQUIRED)
+find_package(HeckeMass CONFIG REQUIRED COMPONENTS FiniteKernel)
 
 add_executable(hecke_mass_c_example main.c)
 target_link_libraries(hecke_mass_c_example PRIVATE HeckeMass::hecke_mass)
