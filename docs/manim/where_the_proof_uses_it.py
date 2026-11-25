@@ -11,8 +11,8 @@ formalization of the Riemann Hypothesis.
                  readout to equal the normalized Hecke sum, and `heckeTieT`
                  transports that condition to a copied setup.
 
-The declaration names are the audited `project_body` paths recorded by the
-research workbench in `proof_profile/research/spine-01/spine_milestones.json`.
+The declaration names are the two paths listed, with a public source link for
+every step, in `docs/dependency-paths.md`.
 The wording of what each theorem does follows `docs/primitive-in-the-proof.md`.
 The level-11 numbers illustrate the arithmetic; the proof applies the same
 formulas to its own data.
@@ -60,7 +60,7 @@ from style import (
     mono,
 )
 
-# Declaration names along the two audited project_body paths, root first.
+# Declaration names along the two paths in docs/dependency-paths.md, root first.
 TRUNK = [
     "riemannHypothesis",
     "rhOfAll",
@@ -99,8 +99,8 @@ MASS_LINKS = SHARED_LINKS + len(MASS_BRANCH)
 HECKE_LINKS = SHARED_LINKS + len(HECKE_BRANCH)
 assert (SHARED_LINKS, MASS_LINKS, HECKE_LINKS) == (8, 15, 19)
 
-# Declarations reachable from the root in the audited export (proof_profile/README.md).
-REACHABLE = "1,478,219"
+# Lean files under the public mirror's tree at the frozen commit, counted with the GitHub trees API.
+LEAN_FILES = "175,189"
 FROZEN_COMMIT = "4e8bb36"
 
 FIXTURES = Path(__file__).resolve().parents[2] / "tests" / "vectors" / "kernel.tsv"
@@ -191,14 +191,14 @@ class WhereTheProofUsesIt(Explainer):
             p2(4.9, 3.0)
         )
         count = VGroup(
-            Text(REACHABLE, font_size=60, color=GLOW),
+            Text(LEAN_FILES, font_size=60, color=GLOW),
             Text(
-                "declarations reachable from the top theorem",
+                "Lean files in the published formalization",
                 font_size=26,
                 color=INK,
             ),
             Text(
-                f"audited export of the frozen source, commit {FROZEN_COMMIT}",
+                f"public frozen mirror, commit {FROZEN_COMMIT}",
                 font_size=20,
                 color=DIM,
             ),
@@ -212,8 +212,8 @@ class WhereTheProofUsesIt(Explainer):
             fill_opacity=0.94,
         )
         self.say(
-            "The proof's top theorem is named riemannHypothesis. About\n"
-            "1.5 million declarations sit beneath it.",
+            "The proof's top theorem is named riemannHypothesis. The published\n"
+            "formalization behind it has about 175,000 Lean files.",
             *self.chapter("The proof"),
             FadeIn(root),
             FadeIn(tag),

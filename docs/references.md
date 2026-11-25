@@ -6,14 +6,23 @@ Alpöge, Levent. 2026. [Lean formalization of the Riemann Hypothesis and GRH for
 
 Alpöge describes working with Claude on the argument and formalization. [Alpöge’s account](https://alpo.ge/remark.pdf)
 
-## Phase 2.1 analysis
+## Prior art
 
-Use a separate bibliography entry for the analysis. Fill in the analysts’ names and a version-specific DOI or permanent release URL for a public citation.
+The arithmetic is classical. These are the public sources the documentation relies on.
 
-> [Analysis authors]. 2026. *Reverse engineering computational arithmetic in the original RH formalization*. Phase 2.1. Research report, Lean certificates, and verification artifacts. [Version-specific DOI or release URL].
+- Gross, Benedict H. 1987. *Heights and the special values of L-series*. Sections 1, 2 and 6 give the level-11 Brandt matrices, the unit-group weights and the mass. [PDF](https://wstein.org/papers/bib/Gross-Heights_and_the_Special_Values_of_L-series.pdf)
+- Kirschmer, Markus, and John Voight. 2010. *Algorithmic enumeration of ideal classes for quaternion orders*. Remark 7.5 uses the mass to stop an enumeration. [arXiv:0808.3833](https://arxiv.org/pdf/0808.3833)
+- Greenberg, Matthew, and John Voight. 2014. *Lattice methods for algebraic modular forms on classical groups*. Section 2 gives the finite coset-sum formula for a Hecke operator. [arXiv:1209.2460](https://arxiv.org/pdf/1209.2460)
+- Martin, Kimball, and Satoshi Wakatsuki. *Mass formulas and Eisenstein congruences in higher rank*. Equations (2.2) and (2.5) give the mass of a finite class set and the Hecke action on functions on that same set. [Section 2](https://arxiv.org/pdf/1907.03417#page=6)
 
-Cite the research report for the extraction methods and mathematical experiments. Cite the Phase 2.1 verification receipt for exact test counts and transitive axiom footprints. The report is `docs/REVERSE_ENGINEERING_REPORT.md` and the receipt is `proof_profile/research/phase-02/release/verification.json` in the workbench source tree.
+The [prior-art report](../reports/Prior%20Art%20for%20Finite%20Arithmetic.md) compares the replayed values with further published tables.
 
-The [finite double-coset sum write-up](primitive-in-the-proof.md) documents the classical precedents and the two audited proof paths.
+## What this repository adds, and how to check it
 
-The factoring audit reports that it found no public-input factoring algorithm in the audited dependency paths.
+The frozen source gives both finite formulas. This repository traces a dependency path from `riemannHypothesis` to each definition and gives a standalone implementation for rational inputs. Readers can check the source analysis and the arithmetic separately.
+
+- [The specification](specification.md) links the two original definitions.
+- [The dependency paths](dependency-paths.md) link the source line for every step from `riemannHypothesis` to each definition.
+- [The write-up](primitive-in-the-proof.md) links the theorems that use them.
+
+The definitions and paths were located with our own exploratory scripts over the compiled formalization. Those scripts and their intermediate records are not published and nothing here relies on them.

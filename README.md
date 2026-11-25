@@ -46,31 +46,33 @@ cargo test --manifest-path rust/Cargo.toml
 
 ## Where this came from
 
-In November 2026 Levent Alpöge published a Lean formalization claiming a
-proof of the Riemann Hypothesis. Many readers have questioned whether the
-proof as a whole is valid. This repository takes no position on that.
+In November 2026, Levent Alpöge released a Lean formalization claiming a
+proof of the Riemann Hypothesis. I wanted to know which parts a reader
+could check and use independently of that claim. [Original submission and
+frozen source](docs/references.md)
 
-I went looking for something else: what is inside the proof that is true
-and useful whatever happens to the headline theorem? A formalization that
-size is built from many smaller definitions and lemmas, and each of them
-can be checked on its own.
+Two definitions give a concrete answer. On one path from
+`riemannHypothesis`, `classMass` gives the sum of reciprocal stabilizer
+orders that appears in a volume identity. On another, `Setup.hecke`
+specifies how to compute the value of a transformed form by summing over
+coset representatives and applying a normalization. Both formulas are
+classical and appear explicitly in the original Lean source.
+[How the proof uses each definition](docs/primitive-in-the-proof.md) ·
+[Classical precedents and source citations](docs/references.md)
 
-This kernel is one such piece. Two definitions in the formalization,
-`classMass` and `Setup.hecke`, reduce to the same small computation: an
-exact sum over a finite table. I extracted that arithmetic, restated it in
-Lean as a standalone project with its own proofs, and implemented it in C
-and Rust against fixtures that Lean generates. Nothing here depends on the
-Riemann Hypothesis or on the rest of Alpöge's proof.
+We trace how Alpöge’s formalization uses class mass and Hecke action,
+isolate the exact arithmetic each requires once its finite data are
+supplied, and publish a standalone Lean specification with replayable C
+and Rust examples. The Lean proofs cover rational arithmetic on the
+supplied tables. Establishing that a table lists the right classes or
+neighbours requires separate evidence. [Verification scope](docs/verification.md)
 
-The arithmetic itself is classical. Reciprocal-stabilizer masses and Hecke
-sums over coset representatives go back to Eichler, Gross and others. What
-is new is identifying the shared primitive inside the formalization,
-extracting it, and tracing how the proof uses its two forms. [How the
-proof uses it](docs/primitive-in-the-proof.md) · [Source and
-citations](docs/references.md)
+## Further reading
 
 - [Kernel specification](docs/specification.md)
 - [How the finite double-coset sums are used in the formalization](docs/primitive-in-the-proof.md)
 - [Lean proof scope and fixture generation](docs/verification.md)
-- [Phase 02 workbench review and replay coverage](docs/phase-02.md)
+- [Dependency paths from `riemannHypothesis`, with source links](docs/dependency-paths.md)
+- [Replayed Brandt matrices and genus masses](docs/replayed-cases.md)
+- [Prior art for the replayed values](reports/Prior%20Art%20for%20Finite%20Arithmetic.md)
 - [CMake, Cargo, and RVV integration](docs/integration.md)

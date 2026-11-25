@@ -18,7 +18,7 @@ The video opens with the result it builds toward: mixing numbers between neighbo
 | The equation | The same number is the baseline minus an elliptic curve's point count, because both sides read the coefficients of one modular form. | $y^2+y=x^3-x^2-10x-20$ has 5 points mod 2 and $2+1-5=-2$, the coefficient of $q^2$ in $q\prod(1-q^n)^2(1-q^{11n})^2$. |
 | The software | At run time a workbench supplies finite lists and the kernel returns exact fractions. At development time Lean defines the operations and generates the fixtures that the C and Rust libraries are tested on. | `hecke(u=2/3, q=7, k=0, r=4, [1/2, -2/3])` gives $-1/4$, a row of `tests/vectors/kernel.tsv`. |
 
-The square is a teaching analogy, and the two-dimensional lattice is a model of what happens at one prime: the real objects are lattices in a four-dimensional quaternion algebra, and the $p+1$ count holds at every prime except 11. The scene enumerates the rules and asserts the count for the primes it lists. It also asserts that the balance $\tfrac14 a=\tfrac16 b$ with at most three arrows each way has the single crossing solution $a=2$, $b=3$. Which class each neighbour belongs to is computed by the upstream workbench, not by this repository. The level-11 data sits in one table at the top of the scene file, and the mass, the matrix, the balance identity, the pattern $(2,-3)$ and its eigenvalue are derived from it and asserted. The scene also counts the curve's points and expands the modular form's product independently and asserts that they agree at the primes shown. It reads the fixture count and the displayed fractional `hecke` row from `tests/vectors/kernel.tsv`. The class-side matrix is computed only at the prime 2; its agreement at other primes is the Eichler–Shimura and Jacquet–Langlands correspondence, which this repository does not compute.
+The square is a teaching analogy, and the two-dimensional lattice is a model of what happens at one prime: the real objects are lattices in a four-dimensional quaternion algebra, and the $p+1$ count holds at every prime except 11. The scene enumerates the rules and asserts the count for the primes it lists. It also asserts that the balance $\tfrac14 a=\tfrac16 b$ with at most three arrows each way has the single crossing solution $a=2$, $b=3$. Which class each neighbour belongs to is not computed by this repository. The lists A, B, B and A, A, A are the rows of the level-11 matrix $B(2)$ that Gross prints. [Gross, §6](https://wstein.org/papers/bib/Gross-Heights_and_the_Special_Values_of_L-series.pdf) The level-11 data sits in one table at the top of the scene file, and the mass, the matrix, the balance identity, the pattern $(2,-3)$ and its eigenvalue are derived from it and asserted. The scene also counts the curve's points and expands the modular form's product independently and asserts that they agree at the primes shown. It reads the fixture count and the displayed fractional `hecke` row from `tests/vectors/kernel.tsv`. The class-side matrix is computed only at the prime 2; its agreement at other primes is the Eichler–Shimura and Jacquet–Langlands correspondence, which this repository does not compute.
 
 ## 2. Where the proof uses it
 
@@ -33,45 +33,7 @@ The sequel opens on the same two worked calls and follows each into Alpöge's Le
 | `GlobalTheory.Mass.classMass` | 15 | Mass identifies a volume. `volumes_eq_masses_of_unfold` uses a double-coset decomposition to equate a volume with the sum of reciprocal symmetry orders. |
 | `GlobalTheory.SeriesTie.Setup.hecke` | 19 | The Hecke sum specifies a readout that survives transport. `HeckeAt` requires a target readout to equal the normalized Hecke sum for every certified local input, and `SerCopy.heckeTieT` carries that condition to the copied setup used in the series construction. |
 
-The wording follows [the written account](../primitive-in-the-proof.md). The paths are the audited `project_body` paths recorded by the research workbench in `proof_profile/research/spine-01/spine_milestones.json`. Each link means that one declaration's body refers to the next. The audited closure has 21 declaration bodies referring to `classMass` and 12 referring to `Setup.hecke`. The network drawn behind the declaration count is schematic.
-
-### Full dependency paths
-
-Shared path, 8 links:
-
-1. `riemannHypothesis`
-2. `rhOfAll`
-3. `allChi`
-4. `UpperTheory.FinalTheorems.everyCharacter`
-5. `UpperTheory.FinalTheorems.everyCharacter_of_row`
-6. `UpperTheory.LiteratureTheorems.every_character_of_literature_of_vWin`
-7. `UpperTheory.Lit.every_character_of_theta_integrals_local_matching`
-8. `UpperTheory.Lit.nonempty_hyps_definite_side_of_closed_bound`
-9. `GlobalTheory.Fc.S0.StageU.hypotheses_nonempty_of_unramified_exponents_alt`
-
-Then to `classMass`, 7 more links:
-
-1. `GlobalTheory.Fc.nonempty_hyps_of_allRows_alt`
-2. `UpperTheory.Top.classSel`
-3. `GlobalTheory.Fc.memberTop_final_contextParameters`
-4. `GlobalTheory.Mem.VolMass.volumes_eq_masses_of_unfold`
-5. `GlobalTheory.DefiniteDecompObj.doubleCosets_mass`
-6. `GlobalTheory.DefiniteDecomp.defClassDecomp`
-7. `GlobalTheory.Mass.classMass`
-
-Or to `Setup.hecke`, 11 more links:
-
-1. `UpperTheory.GalC.final_alt_alt`
-2. `UpperTheory.GalC.final_of_alt`
-3. `GlobalTheory.NLink.Final.slot_mv_extension_with_list_geo_cl`
-4. `GlobalTheory.T.exists_kept_choice_upper_lattice_alt`
-5. `GlobalTheory.LayerMove.exists_kept_nChoice_thData_upL`
-6. `GlobalTheory.T.geo_heq_geoHalf_of_same`
-7. `GlobalTheory.LayerMove.SerUp.ex`
-8. `GlobalTheory.LayerMove.SerUp.ex._proof_7`
-9. `GlobalTheory.HeightCounting.SerCopy.heckeTieT`
-10. `GlobalTheory.SeriesTie.HeckeAt`
-11. `GlobalTheory.SeriesTie.Setup.hecke`
+The wording follows [the written account](../primitive-in-the-proof.md). Both paths are listed in [the dependency paths](../dependency-paths.md), where every step links to the line of the public source that makes it. The size shown at the start, 175,189 Lean files, is the number of `.lean` files in the public mirror's tree at the frozen commit. The network drawn behind it is schematic.
 
 ## Rendering
 
@@ -83,3 +45,8 @@ sh docs/manim/render.sh
 ```
 
 The script renders each scene at 1920×1080 and 30 fps under `build/manim/`, then writes a compact H.264 MP4 and a poster frame next to its source. `style.py` holds the palette and the `Explainer` scene base, which paces each subtitle by its word count.
+
+
+## Audio Credits
+
+Music by <a href="https://pixabay.com/users/inspirationnationyt-29865471/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=120404">Daniel Weir</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=120404">Pixabay</a>
