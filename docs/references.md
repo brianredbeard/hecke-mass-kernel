@@ -15,7 +15,7 @@ The arithmetic is classical. These are the public sources the documentation reli
 - Greenberg, Matthew, and John Voight. 2014. *Lattice methods for algebraic modular forms on classical groups*. Section 2 gives the finite coset-sum formula for a Hecke operator. [arXiv:1209.2460](https://arxiv.org/pdf/1209.2460)
 - Martin, Kimball, and Satoshi Wakatsuki. *Mass formulas and Eisenstein congruences in higher rank*. Equations (2.2) and (2.5) give the mass of a finite class set and the Hecke action on functions on that same set. [Section 2](https://arxiv.org/pdf/1907.03417#page=6)
 
-The [prior-art report](../reports/Prior%20Art%20for%20Finite%20Arithmetic.md) compares the replayed values with further published tables.
+The [prior-art report](research/prior-art/README.md) compares the replayed values with published tables. The [novelty assessment](research/kernel-novelty/README.md) compares the extraction and proof trace with earlier work.
 
 ## What this repository adds, and how to check it
 

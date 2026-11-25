@@ -25,7 +25,7 @@ The recorded values can be compared with published ones.
 
 - **Level 37.** The eigenvalues of each matrix should be $p+1$ and the coefficients $a_p$ of the two rational newforms of level 37. They are, for all 14 primes, when $a_p$ is computed by counting points on $y^2+y=x^3-x$ and $y^2+y=x^3+x^2-23x-50$. [LMFDB 37.2.a.a](https://www.lmfdb.org/ModularForm/GL2/Q/holomorphic/37/2/a/a/) · [LMFDB 37.2.a.b](https://www.lmfdb.org/ModularForm/GL2/Q/holomorphic/37/2/a/b/)
 - **Level 23.** Every row sums to $p+1$, and the remaining two eigenvalues are conjugate in $\mathbf Q(\sqrt5)$, the coefficient field of the newform of level 23. [LMFDB 23.2.a.a](https://www.lmfdb.org/ModularForm/GL2/Q/holomorphic/23/2/a/a/)
-- **Hermitian genera.** The [prior-art report](../reports/Prior%20Art%20for%20Finite%20Arithmetic.md) matches the Gaussian masses $1/32$ and $1/384$ to Schiemann's tables and derives the cyclotomic value from earlier mass formulas.
+- **Hermitian genera.** The [prior-art report](research/prior-art/README.md) matches the Gaussian masses $1/32$ and $1/384$ to Schiemann's tables and derives the cyclotomic value from earlier mass formulas.
 
 ## Regenerating the fixtures
 
