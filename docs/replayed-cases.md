@@ -1,6 +1,6 @@
 # Replayed cases
 
-Beyond the level-11 example, the fixtures replay the finite arithmetic for the level-23 and level-37 Brandt matrices and for four definite Hermitian genera. The stabilizer orders, neighbour destinations and expected matrices are checked in as data in `lean/HeckeMassKernel/Phase02Cases.lean`.
+Beyond the level-11 example, the fixtures replay the finite arithmetic for the level-23 and level-37 Brandt matrices and for four definite Hermitian genera. The stabilizer orders, neighbour destinations and expected matrices are checked in as data in `lean/HeckeMassKernel/ReplayedCases.lean`.
 
 | Case | Full stabilizer orders | Full mass | Operators | Directed edges |
 | --- | --- | --- | ---: | ---: |
@@ -15,7 +15,7 @@ The modular projective convention divides the full stabilizer orders by two, giv
 
 ## What the replay establishes
 
-For each operator, the Lean fixture generator takes the recorded destination class of every neighbour, forms the indicator of each target class, and evaluates `hecke` on it with character $1$ and degree $0$. It stops with an error unless every result equals the recorded matrix entry. It evaluates `classMass` on each list of orders the same way. The C and Rust tests then replay all 270 matrix entries and all eight mass values from the generated fixtures.
+For each operator, the Lean fixture generator takes the recorded destination class of every neighbour, forms the indicator of each target class, and evaluates `hecke` on it with character $1$ and degree $0$. It stops with an error unless every result equals the recorded matrix entry. Before emitting fixtures, it also checks algebraic invariants across every multi-class family: constant row sums $p+1$ for modular levels 23 and 37, weighted detailed balance $d_j B_{ij} = d_i B_{ji}$ against the recorded stabilizer orders, and pairwise commutativity $B_a B_b = B_b B_a$ within each family (levels 23, 37, and Gaussian determinant 5). It evaluates `classMass` on each list of orders the same way. The C and Rust tests then replay all 270 matrix entries, all eight mass values, and the synthetic edge cases from the generated fixtures.
 
 This shows that the three implementations agree with each other and with the recorded tables. It does not show that the recorded tables are the true Brandt matrices or genus masses. The neighbour computations that produced them are not part of this repository.
 

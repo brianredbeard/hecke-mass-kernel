@@ -2,7 +2,9 @@
 
 ## Lean
 
-`HeckeMassKernel.Finite` proves the recursive mass equations, the finite Hecke formula and selected exact outputs. These theorems concern the arithmetic on supplied tables. The upstream interpretation of a table as a global mass or Hecke coefficient uses separate bridge theorems and certificates.
+`HeckeMassKernel.Finite` proves canonical lowest-terms reduction (`reduce_gcd_one`, `reduce_eq_of_equiv`, `render_eq_of_equiv`), rational ring/inversion laws, balanced pairwise summation equivalence (`sum_eq_foldr`), recursive mass equations, permutation invariance (`classMass_perm`, `hecke_perm`), additivity and linearity (`classMass_append`, `hecke_append`), full-versus-projective stabilizer scaling (`classMass_double_orders`), the mass-stopping completeness theorem (`classMass_complete_of_eq`), equivalence of the short-circuiting Hecke implementation with the direct formula (`hecke_formula`), and concrete exact outputs (`mass_six`, `mass_level_eleven`, `hecke_minus_two`, `hecke_odd_rank_even_k`). All theorems in `lean/` use zero external dependencies and only Lean’s standard axioms.
+
+The separate [`bridge/UpstreamEquivalence.lean`](../bridge/README.md) module connects the rational formulas to Alpöge’s `GlobalTheory.Mass.classMass` and `GlobalTheory.SeriesTie.Setup.hecke` (including `HeckeAt`) when checked against the pinned parent formalization.
 
 `HeckeMassKernel.Scaffold.probeSpec` specifies the scaffold operation on one `UInt32`. The executable reference maps the operation over a list. Lean checks that the reference preserves length and agrees with the specification at every index, including indexes outside the list.
 
@@ -10,6 +12,8 @@
 cd lean
 lake build
 ```
+
+`lake build` builds the library, `HeckeMassKernel.ReplayedCases`, and both vector-generator executables.
 
 ## Shared fixtures
 
@@ -23,8 +27,8 @@ mkdir -p build
   cp build/kernel.tsv tests/vectors/kernel.tsv
 ```
 
-`tests/vectors/kernel.tsv` has three tab-separated columns for the operation, space-separated inputs and reduced rational output. For `mass` the inputs are the orders. For `hecke` the first four inputs are `u q k rank`, followed by the samples. The C and Rust integration tests run every row against their public APIs.
+`tests/vectors/kernel.tsv` has three tab-separated columns for the operation, space-separated inputs and reduced rational output. For `mass` the inputs are the orders. For `hecke` the first four inputs are `u q k rank`, followed by the samples. The synthetic cases cover edge semantics including odd higher rank with even $k$ (distinguishing $k\lfloor r/2\rfloor$ from $\lfloor kr/2\rfloor$), fractional characters and samples with $q^e > 1$, $0^0 = 1$ via both $k=0$ and $\text{rank}=1$, arbitrary-precision $k$ and $\text{rank} > 2^{64}$, and zero-short-circuiting on huge exponents. The C and Rust integration tests run every row against their public APIs.
 
 [Replayed cases](replayed-cases.md) identifies the recorded masses and matrices included in these fixtures and what the replay does and does not establish.
 
-CI compares freshly generated fixtures with the checked-in files. The C and Rust scaffold tests use the probe fixtures across a range of batch lengths. The C probe test also covers in-place operation. The RVV job runs that test under QEMU at two vector lengths. The Lean theorems apply to the Lean reference.
+CI compares freshly generated fixtures with the checked-in files. The C suite tests both Release and ASan/UBSan builds (with `-Wall -Wextra -Werror`), exercises checked invalid-input rejection, pointer aliasing, and permutation invariance, and builds the installed CMake consumer requiring `COMPONENTS FiniteKernel`. The Rust suite runs unit tests, doctests, randomized property checks, fixture replay, and all six worked examples. The RVV job runs the scaffold test under QEMU at two vector lengths. The Lean theorems apply to the Lean reference.
