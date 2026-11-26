@@ -1,0 +1,10 @@
+prefix=${pcfiledir}/@pkgconfig_prefix@
+libdir=@pkgconfig_libdir@
+includedir=@pkgconfig_includedir@
+
+Name: HeckeMass
+Description: Exact finite-table class mass and Hecke arithmetic
+Version: @PROJECT_VERSION@
+Requires: @pkgconfig_requires@
+Libs: -L${libdir} -lhecke_mass
+Cflags: -I${includedir}

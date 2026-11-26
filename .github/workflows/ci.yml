@@ -47,6 +47,11 @@ jobs:
           cmake -S examples/c -B build/c-example -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/hecke-mass"
           cmake --build build/c-example
           ctest --test-dir build/c-example --output-on-failure
+      - name: Build and run the pkg-config consumer
+        run: |
+          export PKG_CONFIG_PATH="$RUNNER_TEMP/hecke-mass/lib/pkgconfig"
+          cc examples/c/main.c $(pkg-config --cflags --libs hecke_mass) -o build/pkg-config-consumer
+          build/pkg-config-consumer
 
   rust:
     name: Native Rust and Cargo consumer
