@@ -65,13 +65,13 @@ def code_card(text: str, size: float = 18, color: str = INK) -> VGroup:
 
 
 HANDOFF_MASS = "class_mass([4, 6])  →  5/12"
-HANDOFF_HECKE = "hecke(1, 2, 0, 2, [0, 1, 1])  →  2"
+HANDOFF_HECKE = "hecke(u=1, q=2, k=0, r=2, [0, 1, 1])  →  2"
 
 
 def handoff_cards() -> tuple[VGroup, VGroup]:
     """The two worked sums, placed identically at the end of part 1 and the start of part 2."""
-    mass = code_card(HANDOFF_MASS, 21, AMBER).move_to([-4.0, 1.6, 0])
-    hecke = code_card(HANDOFF_HECKE, 21, BLUE).move_to([3.2, 1.6, 0])
+    mass = code_card(HANDOFF_MASS, 19, AMBER).move_to([-4.2, 1.6, 0])
+    hecke = code_card(HANDOFF_HECKE, 18, BLUE).move_to([2.6, 1.6, 0])
     return mass, hecke
 
 

@@ -44,6 +44,7 @@ from manim import (
     MathTex,
     MoveToTarget,
     Rectangle,
+    ReplacementTransform,
     RoundedRectangle,
     Square,
     SurroundingRectangle,
@@ -65,8 +66,8 @@ from style import (
     check,
     code_card,
     grid_icon,
-    lines,
     handoff_cards,
+    lines,
     mono,
 )
 
@@ -169,7 +170,7 @@ assert FORM[1] == EIGENVALUE
 FIXTURES = Path(__file__).resolve().parents[2] / "tests" / "vectors" / "kernel.tsv"
 _rows = [line.rstrip("\n") for line in FIXTURES.read_text().splitlines() if line]
 FIXTURE_COUNT = len(_rows)
-assert "hecke\t2/3 7 0 4 1/2 -2/3\t-1/4" in _rows
+assert "hecke\t3/4 2 3 7 1/2 1/3 1/6\t1/384" in _rows
 assert "mass\t4 6\t5/12" in _rows
 
 EQUATION = (r"y^2+y", "=", r"x^3-x^2-10x-20")
@@ -955,14 +956,14 @@ class WhatTheKernelComputes(Explainer):
         )
         self.read()
         note = lines(
-            "schematic: the workbench builds\nthe objects and tests equivalence",
+            "external computation:\nbuilds objects and tests equivalence",
             22,
             GLOW,
             buff=0.1,
         ).move_to(p2(3.9, -1.75))
         self.say(
             "The count of three came from the prime. These labels did not:\n"
-            "an upstream program, the workbench, has to compute them.",
+            "an upstream computation has to build the objects and classify them.",
             FadeIn(note),
         )
         self.read()
@@ -1190,23 +1191,25 @@ class WhatTheKernelComputes(Explainer):
         )
         self.read()
 
-        card = code_card("hecke(u=2/3, q=7, k=0, r=4, [1/2, -2/3])  →  -1/4", 22)
-        card.move_to(p2(0, 0.0))
+        card = code_card(
+            "hecke(u=3/4, q=2, k=3, r=7, [1/2, 1/3, 1/6])  →  1/384", 19
+        )
+        card.move_to(p2(0, 0.05))
         worked = MathTex(
-            r"\frac{\tfrac12-\tfrac23}{\tfrac23\cdot 7^{\,0}}",
+            r"\frac{\tfrac12+\tfrac13+\tfrac16}{\tfrac34\cdot 2^{\,3\lfloor 7/2\rfloor}}",
             "=",
-            r"\frac{-\tfrac16}{\tfrac23}",
+            r"\frac{1}{\tfrac34\cdot 512}",
             "=",
-            r"-\tfrac14",
-            font_size=52,
+            r"\tfrac{1}{384}",
+            font_size=48,
         ).move_to(p2(0, -1.45))
         worked[4].set_color(GLOW)
         source = mono("a row of tests/vectors/kernel.tsv", 16, DIM).next_to(
             card, UP, buff=0.15
         )
         self.say(
-            "With fractions in, the answer is an exact fraction out,\n"
-            "never a rounded decimal.",
+            "With nonzero k and odd rank—here 3 and 7—the floor picks 2^(3×3) = 512.\n"
+            "Exact fractions in give an exact fraction out, never a rounded decimal.",
             FadeIn(card, shift=0.2 * UP),
             FadeIn(source),
             FadeIn(worked),
@@ -1269,14 +1272,19 @@ class WhatTheKernelComputes(Explainer):
         self.balanced[2].set_color(BLUE)
         tick = check(56).next_to(self.balanced, RIGHT, buff=0.35)
         self.balanced.add(tick)
+        balance_name = Text("detailed balance", font_size=22, color=GLOW).next_to(
+            self.balanced, DOWN, buff=0.1
+        )
         self.say(
             "Weigh each side by its mass from part 1: 1/4 × 2 = 1/6 × 3.\n"
-            "The table is exactly balanced by the masses.",
+            "This symmetry across the table is called detailed balance.",
             FadeIn(self.mass_a),
             FadeIn(self.mass_b),
             FadeIn(self.balanced, shift=0.2 * UP),
+            FadeIn(balance_name),
         )
         self.read()
+        self.play(FadeOut(balance_name), run_time=0.25)
         bounds = MathTex(
             r"3n_{AB}=2n_{BA},\qquad 0\le n_{AB},n_{BA}\le 3",
             font_size=37,
@@ -1641,7 +1649,7 @@ class WhatTheKernelComputes(Explainer):
 
     # --------------------------------------------------------- compare primes
     def compare_primes(self):
-        base_y, step, pitch = 0.55, 0.5, 1.45
+        base_y, step, pitch = 0.55, 0.5, 1.24
         baseline = Line(p2(-3.0, base_y), p2(6.7, base_y), color=DIM, stroke_width=2)
         legend = VGroup(
             lines("curve:\np + 1 − points", 24, CURVE, buff=0.1),
@@ -1649,17 +1657,16 @@ class WhatTheKernelComputes(Explainer):
         ).arrange(DOWN, buff=0.5)
         legend.move_to(p2(-5.1, 0.6))
         groups = VGroup()
-        for i, (p, gap, coefficient) in enumerate(
-            zip(PRIMES, CURVE_GAPS, FORM_AT_PRIMES)
-        ):
-            x = -2.2 + pitch * i
+        slots = [0, 1, 2, 3, 5, 6, 7]
+        for slot, p, gap, coefficient in zip(slots, PRIMES, CURVE_GAPS, FORM_AT_PRIMES):
+            x = -2.45 + pitch * slot
             pair = VGroup()
             for offset, value, color in (
-                (-0.24, gap, CURVE),
-                (0.24, coefficient, GLOW),
+                (-0.22, gap, CURVE),
+                (0.22, coefficient, GLOW),
             ):
                 bar = Rectangle(
-                    width=0.42,
+                    width=0.38,
                     height=max(0.06, step * abs(value)),
                     stroke_width=0,
                     fill_color=color,
@@ -1670,16 +1677,31 @@ class WhatTheKernelComputes(Explainer):
                 )
                 pair.add(bar)
             sign = 1 if gap >= 0 else -1
-            value = MathTex(str(gap), font_size=40, color=INK).move_to(
+            value = MathTex(str(gap), font_size=38, color=INK).move_to(
                 p2(x, base_y + step * gap + 0.35 * sign)
             )
-            prime = MathTex(f"p={p}", font_size=32, color=DIM).move_to(p2(x, -1.35))
+            prime = MathTex(f"p={p}", font_size=30, color=DIM).move_to(p2(x, -1.35))
             groups.add(VGroup(pair, value, prime))
+        bad_x = -2.45 + pitch * 4
+        bad_line = Line(
+            p2(bad_x, base_y - 0.8),
+            p2(bad_x, base_y + 0.8),
+            color=WARN,
+            stroke_width=2,
+            stroke_opacity=0.65,
+        )
+        bad_prime = MathTex("p=11", font_size=30, color=WARN).move_to(
+            p2(bad_x, -1.35)
+        )
+        bad_tag = Text("level", font_size=18, color=WARN).next_to(
+            bad_prime, DOWN, buff=0.06
+        )
+        bad_marker = VGroup(bad_line, bad_prime, bad_tag)
         credit = lines(
             "Both series are computed independently in this scene: one by counting points, one by expanding the product.",
             18,
             DIM,
-        ).move_to(p2(0.6, -2.05))
+        ).move_to(p2(0.6, -2.18))
         self.say(
             "These bars compare curve counts with series coefficients.\n"
             "We computed the neighbour table only at p = 2.",
@@ -1687,8 +1709,11 @@ class WhatTheKernelComputes(Explainer):
             FadeIn(legend),
             FadeIn(credit),
         )
-        for group in groups:
-            self.play(FadeIn(group, shift=0.15 * UP), run_time=0.4)
+        for group in groups[:4]:
+            self.play(FadeIn(group, shift=0.15 * UP), run_time=0.35)
+        self.play(FadeIn(bad_marker), run_time=0.35)
+        for group in groups[4:]:
+            self.play(FadeIn(group, shift=0.15 * UP), run_time=0.35)
         self.read()
         self.say(
             "They agree at every prime of good reduction: for this curve,\n"
@@ -1732,8 +1757,8 @@ class WhatTheKernelComputes(Explainer):
             p2(0, 3.0)
         )
         self.say(
-            "We used Gross’s table at level 11. The Rust example finds these edges\n"
-            "independently from the roots of a modular polynomial modulo 11.",
+            "We used Gross’s table at level 11. The two classes A and B correspond\n"
+            "to the supersingular elliptic curves mod 11, with j = 1 and j = 0.",
             *self.chapter("Part 4 of 4: the software"),
             FadeIn(title),
             FadeIn(icon_a),
@@ -1756,32 +1781,47 @@ class WhatTheKernelComputes(Explainer):
         back = Arrow(p2(3.5, 0.85), p2(-3.5, 0.85), color=BLUE, buff=0)
         flow_a = flow(weights[0], forward, AMBER, 1.98)
         flow_b = flow(weights[1], reverse, BLUE, 0.37)
+        balanced_eq = VGroup(
+            MathTex(r"\tfrac25", "=", r"\tfrac25", font_size=40, color=GLOW),
+            check(34),
+        ).arrange(RIGHT, buff=0.2)
+        balanced_eq.move_to(p2(0, -0.35))
         formula = Text(
-            "flow = vertex weight × chance of crossing", font_size=27
-        ).move_to(p2(0, -1.08))
+            "detailed balance: vertex weight × chance of crossing", font_size=26
+        ).move_to(p2(0, -1.12))
         self.say(
             "Divide each mass by 5/12 to get its share. Starting at A, two of\n"
-            "three edges cross. From B, all cross. The flows agree at 2/5.",
+            "three edges cross. From B, all cross. Detailed balance holds at 2/5.",
             FadeIn(label_a),
             FadeIn(label_b),
             Create(forth),
             Create(back),
             FadeIn(flow_a),
             FadeIn(flow_b),
+            FadeIn(balanced_eq),
             FadeIn(formula),
         )
         self.read()
         wrong = flow(weights[0], faulty_forward, WARN, 1.98)
+        unbalanced_eq = MathTex(
+            r"\tfrac{3}{10}", r"\neq", r"\tfrac25", font_size=42
+        ).move_to(p2(0, -0.35))
+        unbalanced_eq[0].set_color(WARN)
+        unbalanced_eq[1].set_color(WARN)
+        unbalanced_eq[2].set_color(BLUE)
         self.say(
             "Now export each destination just once. From A, the chance of crossing\n"
-            "drops to one half. The flows disagree: 3/10 one way, 2/5 the other.",
+            "drops to one half. Detailed balance breaks: 3/10 one way, 2/5 the other.",
             FadeOut(chips_a[2]),
             FadeOut(chips_b[1]),
             FadeOut(chips_b[2]),
+            VGroup(chips_a[0], chips_a[1]).animate.arrange(RIGHT, buff=0.1).move_to(p2(-4.8, 0.05)),
+            chips_b[0].animate.move_to(p2(4.8, 0.05)),
             Transform(flow_a, wrong),
+            ReplacementTransform(balanced_eq, unbalanced_eq),
         )
         self.read()
-        self.play(FadeOut(formula), run_time=0.35)
+        self.play(FadeOut(formula), FadeOut(unbalanced_eq), run_time=0.35)
         command = code_card(
             "cargo run --locked --manifest-path examples/rust/Cargo.toml --example isogeny_graph",
             size=17,
@@ -1789,8 +1829,8 @@ class WhatTheKernelComputes(Explainer):
         if command.width > 13.1:
             command.scale_to_fit_width(13.1)
         self.say(
-            "Run this example from the repository root. The kernel evaluates the\n"
-            "supplied lists exactly. The balance check exposes the lost edges.",
+            "The Rust example finds these edges independently from Φ₂ mod 11.\n"
+            "The detailed-balance check catches the lost edges immediately.",
             FadeIn(command),
         )
         self.read(0.5)
@@ -1828,13 +1868,13 @@ class WhatTheKernelComputes(Explainer):
         )
         self.read()
         verification = Text(
-            f"Lean generates {FIXTURE_COUNT} fixtures. C and Rust replay them.",
-            font_size=28,
+            f"Lean proves algebraic laws and generates {FIXTURE_COUNT} fixtures. C and Rust replay them.",
+            font_size=26,
             color=INK,
         ).move_to(p2(0, -1.72))
         self.say(
-            "Lean proves properties of the arithmetic on supplied tables.\n"
-            "The next film traces the two formulas through Alpöge’s Lean source.",
+            "Lean proves laws of the arithmetic on supplied tables.\n"
+            "The next film traces both sums into Alpöge’s Lean source and the bridge.",
             FadeIn(verification),
         )
         self.read(1.0)

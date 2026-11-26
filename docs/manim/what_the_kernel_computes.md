@@ -66,7 +66,7 @@ For A, one neighbour is equivalent to A itself and two are equivalent to B. Diff
 
 Do the same for an object of class B: all three of its neighbours are equivalent to A.
 
-The count of three came from the prime. These labels did not: an upstream program, the workbench, has to compute them.
+The count of three came from the prime. These labels did not: an upstream computation has to build the objects and classify them.
 
 Draw one arrow per neighbour, pointing at its class. Three arrows leave A and three leave B.
 
@@ -76,7 +76,7 @@ The loop is a real step whose result is equivalent to A. None of B's three steps
 
 ## The Brandt matrix
 
-[4:17 in the video](what_the_kernel_computes.mp4#t=257.033)
+[4:17 in the video](what_the_kernel_computes.mp4#t=257.600)
 
 Now turn the arrows into numbers. Each class has its list of three neighbours, already sorted into classes.
 
@@ -88,11 +88,11 @@ Every other cell is another call. The finished table is known as the Brandt matr
 
 There the scale was 1. In general it is built from parameters the caller supplies, and the samples need not be 0 or 1.
 
-With fractions in, the answer is an exact fraction out, never a rounded decimal.
+With nonzero k and odd rank—here 3 and 7—the floor picks 2^(3×3) = 512. Exact fractions in give an exact fraction out, never a rounded decimal.
 
 Now connect the two functions. A counts B twice among its neighbours; B counts A three times. It looks lopsided.
 
-Weigh each side by its mass from part 1: 1/4 × 2 = 1/6 × 3. The table is exactly balanced by the masses.
+Weigh each side by its mass from part 1: 1/4 × 2 = 1/6 × 3. This symmetry across the table is called detailed balance.
 
 Call the two crossing counts n_AB and n_BA. Each has to be a whole number from 0 to 3. Two pairs satisfy the balance equation.
 
@@ -112,7 +112,7 @@ Both coordinates are multiplied by −2. This common scale factor is the Hecke e
 
 ## Part 3 of 4: counting points on the curve
 
-[6:35 in the video](what_the_kernel_computes.mp4#t=395.700)
+[6:40 in the video](what_the_kernel_computes.mp4#t=400.467)
 
 Now the other side: an equation that appears to have nothing to do with our neighbour graph.
 
@@ -134,20 +134,20 @@ They agree at every prime of good reduction: for this curve, every prime except 
 
 ## Part 4 of 4: the software
 
-[7:47 in the video](what_the_kernel_computes.mp4#t=467.633)
+[7:52 in the video](what_the_kernel_computes.mp4#t=472.400)
 
-We used Gross’s table at level 11. The Rust example finds these edges independently from the roots of a modular polynomial modulo 11.
+We used Gross’s table at level 11. The two classes A and B correspond to the supersingular elliptic curves mod 11, with j = 1 and j = 0.
 
-Divide each mass by 5/12 to get its share. Starting at A, two of three edges cross. From B, all cross. The flows agree at 2/5.
+Divide each mass by 5/12 to get its share. Starting at A, two of three edges cross. From B, all cross. Detailed balance holds at 2/5.
 
-Now export each destination just once. From A, the chance of crossing drops to one half. The flows disagree: 3/10 one way, 2/5 the other.
+Now export each destination just once. From A, the chance of crossing drops to one half. Detailed balance breaks: 3/10 one way, 2/5 the other.
 
-Run this example from the repository root. The kernel evaluates the supplied lists exactly. The balance check exposes the lost edges.
+The Rust example finds these edges independently from Φ₂ mod 11. The detailed-balance check catches the lost edges immediately.
 
 ## Recap
 
-[8:24 in the video](what_the_kernel_computes.mp4#t=504.367)
+[8:30 in the video](what_the_kernel_computes.mp4#t=510.367)
 
 Counting B destinations gives the entry 2. Mixing the whole vector gives the factor −2, the same number we found by counting points.
 
-Lean proves properties of the arithmetic on supplied tables. The next film traces the two formulas through Alpöge’s Lean source.
+Lean proves laws of the arithmetic on supplied tables. The next film traces both sums into Alpöge’s Lean source and the bridge.

@@ -1,12 +1,12 @@
 # Animations
 
-These two silent films introduce the arithmetic without assuming any number theory. Each has on-screen narration, an English subtitle track, and a chaptered transcript. [Manim Community](https://www.manim.community/)
+These two silent films introduce the arithmetic without assuming any number theory. Each has on-screen narration, downloadable English WebVTT captions, and a chaptered transcript. [Manim Community](https://www.manim.community/)
 
 ## 1. What the kernel computes
 
 [![Frame from the first explainer](what_the_kernel_computes.png)](what_the_kernel_computes.mp4)
 
-[Play the film (8:41)](what_the_kernel_computes.mp4) · [Read the transcript](what_the_kernel_computes.md) · [Download WebVTT captions](what_the_kernel_computes.vtt)
+[Play the film (8:48)](what_the_kernel_computes.mp4) · [Read the transcript](what_the_kernel_computes.md) · [Download WebVTT captions](what_the_kernel_computes.vtt)
 
 The video opens with the result it builds toward: mixing numbers between neighbours and counting solutions of an equation both give −2. Each part then uses what the previous one produced.
 
@@ -14,9 +14,9 @@ The video opens with the result it builds toward: mixing numbers between neighbo
 | --- | --- | --- |
 | Fair counting | Weight each pattern by 1 ÷ its symmetries. The total is known in advance, so reaching it certifies that a list of genuine, distinct classes is complete. | 16 corner markings of a square, 6 patterns, total $16/4=4$. Then level 11: $1/4+1/6=5/12=(11-1)/24$. |
 | What a neighbour is | At the prime 2, keep an index-two sublattice. The marked origin explains why the odd columns fail. At a prime $p$, each rule $ax+by\equiv 0 \pmod p$ comes from a nonzero pair up to scaling, giving $p+1$ neighbours. | The three parity rules keep even $x$, even $y$, or even $x+y$. In the level-11 table, A's neighbours land in A, B, B and B's land in A, A, A. |
-| Mixing over neighbours | Each kernel call computes one cell of the Brandt matrix. The masses balance that matrix, which singles out the pattern with mass-weighted average zero. Mixing scales it. | $\left(\begin{smallmatrix}1&2\\3&0\end{smallmatrix}\right)$, $\tfrac14\cdot 2=\tfrac16\cdot 3$, so $3a+2b=0$ gives $(2,-3)\mapsto(-4,6)=-2\,(2,-3)$. |
+| Mixing over neighbours | Each kernel call computes one cell of the Brandt matrix, and the general normalization scales by $u^{-1}q^{-k\lfloor r/2\rfloor}$. Detailed balance links the masses to the matrix and singles out the pattern with mass-weighted average zero. Mixing scales it. | $\left(\begin{smallmatrix}1&2\\3&0\end{smallmatrix}\right)$, `hecke(3/4, 2, 3, 7, [1/2, 1/3, 1/6]) = 1/384`, $\tfrac14\cdot 2=\tfrac16\cdot 3$, so $3a+2b=0$ gives $(2,-3)\mapsto(-4,6)=-2\,(2,-3)$. |
 | The equation | The same number is the baseline minus an elliptic curve's point count, because both sides read the coefficients of one modular form. | $y^2+y=x^3-x^2-10x-20$ has 5 points mod 2 and $2+1-5=-2$, the coefficient of $q^2$ in $q\prod(1-q^n)^2(1-q^{11n})^2$. |
-| The software | A graph exporter drops repeated destinations. The two directions of a balanced walk then carry different amounts of probability. | The [Rust example](../../examples/rust/examples/isogeny_graph.rs) derives the edges from a modular polynomial. Correct flows are $2/5$ both ways. Deduplication changes the forward flow to $3/10$. |
+| The software | The classes A and B match the supersingular curves $j=1,0 \bmod 11$. A graph exporter drops repeated destinations, breaking detailed balance. | The [Rust example](../../examples/rust/examples/isogeny_graph.rs) derives the edges from a modular polynomial. Correct flows are $2/5$ both ways. Deduplication changes the forward flow to $3/10$. |
 
 The square is a teaching analogy, and the two-dimensional lattice is a model of what happens at one prime: the real objects are lattices in a four-dimensional quaternion algebra, and the $p+1$ count holds at every prime except 11. The scene enumerates the rules and asserts the count for the primes it lists. It also asserts that the balance $\tfrac14 a=\tfrac16 b$ with at most three arrows each way has the single crossing solution $a=2$, $b=3$. Which class each neighbour belongs to is not computed by this repository. The lists A, B, B and A, A, A are the rows of the level-11 matrix $B(2)$ that Gross prints. [Gross, §6](https://wstein.org/papers/bib/Gross-Heights_and_the_Special_Values_of_L-series.pdf) The level-11 data sits in one table at the top of the scene file, and the mass, the matrix, the balance identity, the pattern $(2,-3)$ and its eigenvalue are derived from it and asserted. The scene also counts the curve's points and expands the modular form's product independently and asserts that they agree at the primes shown. It reads the fixture count and the displayed fractional `hecke` row from `tests/vectors/kernel.tsv`. The class-side matrix is computed only at the prime 2; its agreement at other primes is the Eichler–Shimura and Jacquet–Langlands correspondence, which this repository does not compute.
 
@@ -30,9 +30,9 @@ cargo run --locked --manifest-path examples/rust/Cargo.toml --example isogeny_gr
 
 [![Frame from the second explainer](where_the_proof_uses_it.png)](where_the_proof_uses_it.mp4)
 
-[Play the film (2:04)](where_the_proof_uses_it.mp4) · [Read the transcript](where_the_proof_uses_it.md) · [Download WebVTT captions](where_the_proof_uses_it.vtt)
+[Play the film (2:48)](where_the_proof_uses_it.mp4) · [Read the transcript](where_the_proof_uses_it.md) · [Download WebVTT captions](where_the_proof_uses_it.vtt)
 
-The sequel opens on the same two worked calls and follows each into Alpöge's Lean formalization of the Riemann Hypothesis ([source and citations](../references.md)). The level-11 numbers illustrate the arithmetic. The proof applies the same formulas to its own data.
+The sequel opens on the same two worked calls, shows the scale of Alpöge's frozen 17.4-million-line archive (`175,187` modules, `1,478,219` reachable declarations) with the caveat that reachability is not logical necessity, follows each path into the formalization ([source and citations](../references.md)), and closes with the formal upstream bridge (`bridge/UpstreamEquivalence.lean`) and 270 replayed matrix entries beyond level 11.
 
 | Definition | Dependency links below `riemannHypothesis` | What the proof does with it |
 | --- | ---: | --- |
@@ -50,4 +50,4 @@ uv pip install manim
 sh docs/manim/render.sh
 ```
 
-The script renders at 1920×1080 and 30 fps under `build/manim/`. It publishes the H.264 video, the poster selected in the scene, WebVTT captions and a Markdown transcript next to each source. The subtitle track and transcript use the same text and scene clock as the on-screen narration. To rebuild one film, pass `what_the_kernel_computes` or `where_the_proof_uses_it` as the script argument.
+The script renders at 1920×1080 and 30 fps under `build/manim/`. It publishes the H.264 video, the poster selected in the scene, WebVTT captions and a Markdown transcript next to each source. The caption file and transcript use the same text and scene clock as the on-screen narration. To rebuild one film, pass `what_the_kernel_computes` or `where_the_proof_uses_it` as the script argument.

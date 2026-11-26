@@ -4,61 +4,82 @@ WEBVTT
 We followed two chains of references from the declaration
 named riemannHypothesis in Alpöge’s Lean source.
 
-00:00:06.200 --> 00:00:15.300
+00:00:06.200 --> 00:00:15.800
 In the proof, the first enters a volume identity and the second
-a compatibility condition. This video follows each one in.
+a compatibility condition. This film traces both and checks the bridge.
 
-00:00:15.300 --> 00:00:23.867
+00:00:15.800 --> 00:00:21.700
+The original archive spans 175,187 modules and reaches almost
+1.5 million declarations from riemannHypothesis.
+
+00:00:21.700 --> 00:00:30.400
+Raw caller counts put core Lean plumbing at the top. Filtering out
+boilerplate leaves small domain operations like classMass and hecke.
+
+00:00:30.400 --> 00:00:38.700
+Reachability in that frozen build shows what this formalization
+actually routed through—not that every RH proof must go this way.
+
+00:00:38.700 --> 00:00:47.267
 In the definition of HeckeAt, rd g is the value being specified.
 On the right, ρ.hecke applies the Hecke operator to rd f.
 
-00:00:23.867 --> 00:00:31.267
+00:00:47.267 --> 00:00:54.667
 That reference gives one edge from HeckeAt to Setup.hecke.
 Watch where it sits in the two paths we traced.
 
-00:00:31.267 --> 00:00:39.467
+00:00:54.667 --> 00:01:02.867
 The highlighted reference ends the blue path. Both paths start
 at riemannHypothesis and share their first eight links.
 
-00:00:39.467 --> 00:00:47.367
-The two paths shown have 15 and 19 links. What does
-each definition contribute to the argument?
+00:01:02.867 --> 00:01:11.467
+From the fork, the amber branch reaches classMass in 15 links;
+the blue branch runs through heckeTieT and HeckeAt in 19.
 
-00:00:47.367 --> 00:00:54.167
+00:01:11.467 --> 00:01:18.267
 In part 1, the masses of A and B filled a bar:
 1/4 + 1/6 = 5/12.
 
-00:00:54.167 --> 00:01:03.367
+00:01:18.267 --> 00:01:27.467
 The proof has the same picture with its own data: a volume cut
 into one piece per double-coset class, each of size 1 ÷ d.
 
-00:01:03.367 --> 00:01:09.867
+00:01:27.467 --> 00:01:33.967
 The theorem volumes_eq_masses_of_unfold uses that decomposition:
 the volume equals the sum of the reciprocal symmetry orders.
 
-00:01:09.867 --> 00:01:15.433
-That sum is classMass. In the proof, mass identifies a volume.
+00:01:33.967 --> 00:01:41.967
+And because every omitted class adds positive weight, matching
+the volume certifies that a list of classes is complete.
 
-00:01:15.433 --> 00:01:21.633
+00:01:41.967 --> 00:01:48.167
 Keep A’s three neighbours in view. Counting the B destinations
 gives the matrix entry 2.
 
-00:01:21.633 --> 00:01:30.833
+00:01:48.167 --> 00:01:57.367
 Now read the function at the same neighbours. Its values are
 2, −3 and −3. They give the new value at A, which is −4.
 
-00:01:30.833 --> 00:01:38.233
+00:01:57.367 --> 00:02:04.767
 HeckeAt requires the target value to agree with the normalized
 neighbour sum for every certified local input.
 
-00:01:38.233 --> 00:01:45.633
-The series construction copies the setup. The lemma heckeTieT
-carries the same equality across to the copy.
+00:02:04.767 --> 00:02:13.067
+The series construction copies that setup so it can match forms
+to series coefficients. heckeTieT carries the equality straight across.
 
-00:01:45.633 --> 00:01:51.533
+00:02:13.067 --> 00:02:20.767
+To check the arithmetic without compiling all 175,187 modules,
+the repo separates the standalone Lean kernel from a formal bridge.
+
+00:02:20.767 --> 00:02:29.367
+The bridge ties the rational formulas to Alpöge’s exact definitions,
+while 270 replayed entries check row sums, detailed balance, and commutativity.
+
+00:02:29.367 --> 00:02:36.167
 So that is where the two sums enter the proof.
-One identifies a volume.
+One identifies a volume and pins completeness.
 
-00:01:51.533 --> 00:02:03.833
-The other specifies the value of a transformed form.
-The same condition holds in the copied setup.
+00:02:36.167 --> 00:02:47.667
+The other specifies the value of a transformed form
+and survives transport into the series setup.

@@ -108,142 +108,142 @@ equivalent to B. Different objects can share a class.
 Do the same for an object of class B: all three of its
 neighbours are equivalent to A.
 
-00:03:43.233 --> 00:03:51.833
+00:03:43.233 --> 00:03:52.400
 The count of three came from the prime. These labels did not:
-an upstream program, the workbench, has to compute them.
+an upstream computation has to build the objects and classify them.
 
-00:03:51.833 --> 00:03:58.633
+00:03:52.400 --> 00:03:59.200
 Draw one arrow per neighbour, pointing at its class.
 Three arrows leave A and three leave B.
 
-00:03:58.633 --> 00:04:06.933
+00:03:59.200 --> 00:04:07.500
 The loop at A does not mean &#x27;do nothing&#x27;. Doing nothing
 would be a different picture, with a loop on every class.
 
-00:04:06.933 --> 00:04:17.033
+00:04:07.500 --> 00:04:17.600
 The loop is a real step whose result is equivalent to A. None of
 B&#x27;s three steps comes back to B, so B has no loop.
 
-00:04:17.033 --> 00:04:24.100
+00:04:17.600 --> 00:04:24.667
 Now turn the arrows into numbers. Each class has its list of
 three neighbours, already sorted into classes.
 
-00:04:24.100 --> 00:04:32.067
+00:04:24.667 --> 00:04:32.633
 Build a table one cell at a time. Start at A. Mark each
 neighbour that lands on B: 0, 1, 1.
 
-00:04:32.067 --> 00:04:41.567
+00:04:32.633 --> 00:04:42.133
 Add the marks, 0 + 1 + 1 = 2, and divide by a scale, here 1.
 That is one call of the kernel&#x27;s second function.
 
-00:04:41.567 --> 00:04:50.667
+00:04:42.133 --> 00:04:51.233
 Every other cell is another call. The finished table is known
 as the Brandt matrix. Assembling it is the caller&#x27;s job.
 
-00:04:50.667 --> 00:04:59.533
+00:04:51.233 --> 00:05:00.100
 There the scale was 1. In general it is built from parameters
 the caller supplies, and the samples need not be 0 or 1.
 
-00:04:59.533 --> 00:05:06.533
-With fractions in, the answer is an exact fraction out,
-never a rounded decimal.
+00:05:00.100 --> 00:05:10.700
+With nonzero k and odd rank—here 3 and 7—the floor picks 2^(3×3) = 512.
+Exact fractions in give an exact fraction out, never a rounded decimal.
 
-00:05:06.533 --> 00:05:14.233
+00:05:10.700 --> 00:05:18.400
 Now connect the two functions. A counts B twice among its
 neighbours; B counts A three times. It looks lopsided.
 
-00:05:14.233 --> 00:05:23.100
+00:05:18.400 --> 00:05:27.867
 Weigh each side by its mass from part 1: 1/4 × 2 = 1/6 × 3.
-The table is exactly balanced by the masses.
+This symmetry across the table is called detailed balance.
 
-00:05:23.100 --> 00:05:32.300
+00:05:27.867 --> 00:05:37.067
 Call the two crossing counts n_AB and n_BA. Each has to be a
 whole number from 0 to 3. Two pairs satisfy the balance equation.
 
-00:05:32.300 --> 00:05:42.500
+00:05:37.067 --> 00:05:47.267
 The table has an edge from A to B. That rules out (0, 0).
 The crossing counts must be 2 and 3, leaving one loop at A.
 
-00:05:42.500 --> 00:05:50.500
+00:05:47.267 --> 00:05:55.267
 Put any numbers a and b on A and B, and mix. Because of that
 balance, the mass-weighted sum just triples.
 
-00:05:50.500 --> 00:05:59.667
+00:05:55.267 --> 00:06:04.433
 So a weighted sum of zero stays zero. The patterns with
 that property are the multiples of 2 on A, −3 on B.
 
-00:05:59.667 --> 00:06:08.233
+00:06:04.433 --> 00:06:13.000
 Keep A’s three destinations in place. Counting arrivals at B gives
 0 + 1 + 1 = 2, one entry in the matrix.
 
-00:06:08.233 --> 00:06:18.333
+00:06:13.000 --> 00:06:23.100
 Now give A the value 2 and B the value −3. On the same three
 destinations, the new values add to −4. That is the output at A.
 
-00:06:18.333 --> 00:06:27.533
+00:06:23.100 --> 00:06:32.300
 From B, all three neighbours land on A, so the second output is 6.
 Compare the entire output vector with the one we put in.
 
-00:06:27.533 --> 00:06:35.700
+00:06:32.300 --> 00:06:40.467
 Both coordinates are multiplied by −2. This common scale factor
 is the Hecke eigenvalue at the prime 2.
 
-00:06:35.700 --> 00:06:42.500
+00:06:40.467 --> 00:06:47.267
 Now the other side: an equation that appears to have
 nothing to do with our neighbour graph.
 
-00:06:42.500 --> 00:06:50.800
+00:06:47.267 --> 00:06:55.567
 Work mod 2: x and y are 0 or 1, and even numbers vanish.
 The equation simplifies, leaving four pairs to try.
 
-00:06:50.800 --> 00:06:56.667
+00:06:55.567 --> 00:07:01.433
 Both sides are 0 whatever you plug in,
 so all four pairs are solutions.
 
-00:06:56.667 --> 00:07:05.233
+00:07:01.433 --> 00:07:10.000
 The completed curve has one more point, at infinity: 5 in all.
 An elliptic curve mod p has about p + 1 points.
 
-00:07:05.233 --> 00:07:12.600
+00:07:10.000 --> 00:07:17.367
 Expected 2 + 1, found 5. The gap is −2:
 the same number the neighbour graph produced.
 
-00:07:12.600 --> 00:07:21.167
+00:07:17.367 --> 00:07:25.933
 Why the same number? Both computations read one hidden object:
 a modular form of level 11, written here as a power series.
 
-00:07:21.167 --> 00:07:31.967
+00:07:25.933 --> 00:07:36.733
 Call its coefficient of q² a₂. Both routes compute a₂ = −2:
 one as a scale factor, one from point counts. It is a theorem.
 
-00:07:31.967 --> 00:07:39.033
+00:07:36.733 --> 00:07:43.800
 These bars compare curve counts with series coefficients.
 We computed the neighbour table only at p = 2.
 
-00:07:39.033 --> 00:07:47.633
+00:07:43.800 --> 00:07:52.400
 They agree at every prime of good reduction: for this curve,
 every prime except 11. The neighbour side matches by theorem.
 
-00:07:47.633 --> 00:07:56.200
-We used Gross’s table at level 11. The Rust example finds these edges
-independently from the roots of a modular polynomial modulo 11.
+00:07:52.400 --> 00:08:02.800
+We used Gross’s table at level 11. The two classes A and B correspond
+to the supersingular elliptic curves mod 11, with j = 1 and j = 0.
 
-00:07:56.200 --> 00:08:05.700
+00:08:02.800 --> 00:08:12.300
 Divide each mass by 5/12 to get its share. Starting at A, two of
-three edges cross. From B, all cross. The flows agree at 2/5.
+three edges cross. From B, all cross. Detailed balance holds at 2/5.
 
-00:08:05.700 --> 00:08:15.267
+00:08:12.300 --> 00:08:21.867
 Now export each destination just once. From A, the chance of crossing
-drops to one half. The flows disagree: 3/10 one way, 2/5 the other.
+drops to one half. Detailed balance breaks: 3/10 one way, 2/5 the other.
 
-00:08:15.267 --> 00:08:24.367
-Run this example from the repository root. The kernel evaluates the
-supplied lists exactly. The balance check exposes the lost edges.
+00:08:21.867 --> 00:08:30.367
+The Rust example finds these edges independently from Φ₂ mod 11.
+The detailed-balance check catches the lost edges immediately.
 
-00:08:24.367 --> 00:08:32.933
+00:08:30.367 --> 00:08:38.933
 Counting B destinations gives the entry 2. Mixing the whole vector
 gives the factor −2, the same number we found by counting points.
 
-00:08:32.933 --> 00:08:41.433
-Lean proves properties of the arithmetic on supplied tables.
-The next film traces the two formulas through Alpöge’s Lean source.
+00:08:38.933 --> 00:08:48.000
+Lean proves laws of the arithmetic on supplied tables.
+The next film traces both sums into Alpöge’s Lean source and the bridge.
