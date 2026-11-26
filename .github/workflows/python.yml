@@ -1,0 +1,88 @@
+name: Python distributions
+
+on:
+  push:
+    paths:
+      - python/**
+      - rust/**
+      - tests/vectors/**
+      - .github/workflows/python.yml
+  pull_request:
+    paths:
+      - python/**
+      - rust/**
+      - tests/vectors/**
+      - .github/workflows/python.yml
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish tested distributions to PyPI
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+            manylinux: "2_28"
+            sdist: "--sdist"
+          - runner: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            manylinux: "2_28"
+          - runner: macos-15
+            target: aarch64-apple-darwin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          manylinux: ${{ matrix.manylinux }}
+          maturin-version: "1.16.0"
+          args: --manifest-path python/Cargo.toml --release --locked --out dist ${{ matrix.sdist }}
+      - name: Install and smoke-test the wheel on Python 3.10
+        shell: bash
+        run: |
+          wheels=(dist/*.whl)
+          python -m pip install --no-deps "${wheels[0]}"
+          python -c 'from fractions import Fraction; from hecke_mass import class_mass; assert class_mass([4, 6]) == Fraction(5, 12)'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Run fixture and adapter tests against the installed wheel
+        shell: bash
+        run: |
+          wheels=(dist/*.whl)
+          python -m pip install "${wheels[0]}[crystal,graphs]"
+          python -m unittest discover -s python/tests -v
+      - uses: actions/upload-artifact@v4
+        with:
+          name: python-${{ matrix.target }}
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    if: github.event_name == 'workflow_dispatch' && inputs.publish && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-24.04
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: python-*
+          path: dist/
+          merge-multiple: true
+      - uses: pypa/gh-action-pypi-publish@release/v1
