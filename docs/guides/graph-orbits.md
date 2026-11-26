@@ -18,13 +18,16 @@ commands are named `nauty-geng` and `nauty-countg`; a source build names them
 set -euo pipefail
 nauty-geng -q 4 | nauty-countg -q -V --a |
   awk -F'groupsize=' 'NF == 2 && $2 ~ /^[1-9][0-9]*$/ { print $2; next } { exit 2 }' |
-  cargo run --quiet --locked --manifest-path cli/Cargo.toml -- +    orbits --group-order 24 --expected 64
+  cargo run --quiet --locked --manifest-path cli/Cargo.toml -- orbits --group-order 24 --expected 64
 ```
 
 Expected output is `complete covered=64 deficit=0`. For an unrestricted
 simple graph run on $n$ vertices, pass group order $n!$ and expected total
 $2^{\binom n2}$. For a run restricted to exactly $m$ edges, use
 $\binom{\binom n2}{m}$ as the expected total.
+
+For a Python replay using automorphism groups from pynauty, see the
+[pynauty notebook](../../python/examples/pynauty_orbits.ipynb).
 
 ## 3. Put it in CI
 

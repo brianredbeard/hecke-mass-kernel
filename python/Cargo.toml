@@ -1,0 +1,14 @@
+[package]
+name = "hecke-mass-python"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+publish = false
+
+[lib]
+name = "_core"
+crate-type = ["cdylib"]
+
+[dependencies]
+hecke-mass-kernel = { path = "../rust", version = "0.1.0" }
+pyo3 = { version = "0.29", features = ["abi3-py310", "extension-module", "num-bigint"] }

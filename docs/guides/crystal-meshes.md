@@ -17,10 +17,13 @@ and run from the repository root. [spglib reciprocal-mesh API](https://spglib.re
 ```bash
 set -euo pipefail
 python examples/audit/spglib_orders.py |
-  cargo run --quiet --locked --manifest-path cli/Cargo.toml -- +    orbits --group-order 48 --expected 8
+  cargo run --quiet --locked --manifest-path cli/Cargo.toml -- orbits --group-order 48 --expected 8
 ```
 
 Expected output is `complete covered=8 deficit=0`.
+
+For the Python API and a shifted mesh example, see the
+[spglib notebook](../../python/examples/spglib_mesh.ipynb).
 
 ## 3. Put it in CI
 

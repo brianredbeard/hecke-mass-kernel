@@ -1,0 +1,16 @@
+{
+  "level_11": {
+    "prime": 2,
+    "stabilizer_orders": [4, 6],
+    "expected_mass": "5/12",
+    "matrix": [[1, 2], [3, 0]],
+    "newform_label": "11.2.a.a",
+    "newform_coefficient": -2
+  },
+  "level_23": {
+    "prime": 2,
+    "stabilizer_orders": [4, 2, 6],
+    "expected_mass": "11/12",
+    "matrix": [[1, 2, 0], [1, 1, 1], [0, 3, 0]]
+  }
+}

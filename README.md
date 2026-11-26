@@ -22,6 +22,11 @@ returns exit code 1 with the exact difference. Malformed input returns
 exit code 2. [Graph generators](docs/guides/graph-orbits.md) ·
 [Crystal meshes](docs/guides/crystal-meshes.md)
 
+Python callers can install the package from this checkout with
+`python -m pip install ./python` and get exact `Fraction` results.
+The cookbooks cover spglib, pynauty, and SageMath with LMFDB data.
+[Python package and cookbooks](python/README.md)
+
 ## Quick start
 
 Run each check from the repository root. Use Elan with the checked-in
