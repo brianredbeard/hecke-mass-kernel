@@ -86,9 +86,10 @@ cargo run --locked --manifest-path examples/rust/Cargo.toml --example isogeny_gr
 
 | What the kernel computes (8:48) | Where the proof uses it (2:48) |
 | :---: | :---: |
-| [![Frame from the first explainer](docs/manim/what_the_kernel_computes.png)](docs/manim/what_the_kernel_computes.mp4) | [![Frame from the second explainer](docs/manim/where_the_proof_uses_it.png)](docs/manim/where_the_proof_uses_it.mp4) |
+| [![Watch What the kernel computes on the blog](docs/manim/what_the_kernel_computes.png)](https://brianredbeard.com/blog/hecke-mass-kernel/#what-the-kernel-computes) | [![Watch Where the proof uses it on the blog](docs/manim/where_the_proof_uses_it.png)](https://brianredbeard.com/blog/hecke-mass-kernel/#where-the-proof-uses-it) |
 | The two sums, worked on the level-11 example. [Transcript](docs/manim/what_the_kernel_computes.md) | The paths from `riemannHypothesis` to `classMass` and `Setup.hecke`. [Transcript](docs/manim/where_the_proof_uses_it.md) |
 
+Select either poster to open its video player on the blog.
 [Sources, captions and rendering instructions](docs/manim/README.md)
 
 ## Where this came from
