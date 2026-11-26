@@ -8,6 +8,20 @@ libraries. [Lean definitions](lean/HeckeMassKernel/Finite.lean) ·
 [C API](c/include/hecke_mass/kernel.h) · [Rust API](rust/src/lib.rs) ·
 [Shared fixtures](tests/vectors/kernel.tsv)
 
+Audit the coverage of a finite orbit table by supplying its group order,
+the expected labeled count, and one stabilizer order per line. This example
+covers five labeled objects with two orbits under a group of order 12.
+
+```sh
+printf '4\n6\n' | cargo run --quiet --locked --manifest-path cli/Cargo.toml -- \
+  orbits --group-order 12 --expected 5
+```
+
+The CLI prints `complete covered=5 deficit=0`. A missing or extra count
+returns exit code 1 with the exact difference. Malformed input returns
+exit code 2. [Graph generators](docs/guides/graph-orbits.md) ·
+[Crystal meshes](docs/guides/crystal-meshes.md)
+
 ## Quick start
 
 Run each check from the repository root. Use Elan with the checked-in

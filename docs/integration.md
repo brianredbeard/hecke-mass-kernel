@@ -33,6 +33,27 @@ hecke-mass-kernel = { git = "https://github.com/brianredbeard/hecke-mass-kernel.
 
 `hecke_mass_kernel::class_mass` takes a slice of `BigUint` orders (with `class_mass_u64` for `&[u64]`). `hecke_mass_kernel::hecke` takes a `BigRational` character value, three `BigUint` parameters, and a slice of `BigRational` samples. Both use balanced pairwise summation and return a `BigRational` in lowest terms. `check_detailed_balance` verifies weighted symmetry of an operator matrix against positive stabilizer orders. The crate reexports `BigInt`, `BigUint`, and `BigRational` and builds with Cargo independently of C and Lean.
 
+## Orbit completeness
+
+The audit computes coverage as the group order times the reciprocal sum of
+the stabilizer orders. It returns the signed deficit, meaning the expected
+total minus coverage. The group and stabilizer orders must be positive.
+Positive orders that fail to divide the group order can yield fractional
+coverage.
+
+- In C, call `hecke_mass_orbit_deficit_checked` with two distinct initialized
+  `mpq_t` outputs and a nonnegative rational target. A positive deficit means
+  missing coverage, and a negative one means excess. The install also provides
+  `pkg-config --cflags --libs hecke_mass`.
+- In Rust, call `orbit_completeness` with the order slice and nonnegative rational
+  target, or feed orders incrementally to `OrbitAccumulator`. The typed status
+  distinguishes complete, missing, and excess, with positive magnitudes in
+  the last two cases.
+- From a checkout, install the CLI with `cargo install --locked --path cli`.
+  The `orbits` command accepts a nonnegative integer target and an optional
+  input file. [Graph-generator recipe](guides/graph-orbits.md) ·
+  [Crystal mesh recipe](guides/crystal-meshes.md)
+
 ## RISC-V Vector backend
 
 `-DHECKE_MASS_ENABLE_RVV=ON` selects the RV64GCV implementation of the C scaffold probe. The resulting library requires a CPU or emulator with the RISC-V Vector extension. The CMake target and public header are the same for either backend.

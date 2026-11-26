@@ -1,0 +1,10 @@
+[package]
+name = "hecke-mass-audit"
+version = "0.1.0"
+edition = "2021"
+description = "Audit finite orbit tables with exact rational arithmetic"
+license = "MIT"
+publish = false
+
+[dependencies]
+hecke-mass-kernel = { version = "0.1.0", path = "../rust" }

@@ -61,6 +61,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: cargo test --manifest-path rust/Cargo.toml
+      - run: cargo test --locked --manifest-path cli/Cargo.toml
       - run: cargo run --locked --manifest-path examples/rust/Cargo.toml
       - name: Run worked examples
         run: |
@@ -74,6 +75,15 @@ jobs:
           "$RUNNER_TEMP/mesh-venv/bin/pip" install spglib==2.7.0
           "$RUNNER_TEMP/mesh-venv/bin/python" examples/rust/spglib_mesh.py |
             cargo run --locked --manifest-path examples/rust/Cargo.toml --example crystal_mesh -- --stdin
+          "$RUNNER_TEMP/mesh-venv/bin/python" examples/audit/spglib_orders.py |
+            cargo run --locked --manifest-path cli/Cargo.toml -- orbits --group-order 48 --expected 8
+      - name: Audit nauty graph counts
+        shell: bash
+        run: |
+          sudo apt-get update && sudo apt-get install -y nauty
+          nauty-geng -q 4 | nauty-countg -q -V --a |
+            awk -F'groupsize=' 'NF == 2 && $2 ~ /^[1-9][0-9]*$/ { print $2; next } { exit 2 }' |
+            cargo run --locked --manifest-path cli/Cargo.toml -- orbits --group-order 24 --expected 64
 
   rvv:
     name: RISC-V Vector fixtures
