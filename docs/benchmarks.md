@@ -108,3 +108,68 @@ Pico exposed eight X100 CPUs to Linux, and the matrix demo passed on each
 of them. SpacemiT documents a separate A100 core with 1024-bit vectors
 and IME-II. The native results above cover the X100's 256-bit RVV and
 base IME. [K3 CPU subsystem](https://github.com/spacemit-com/docs-chip/blob/main/en/key_stone/k3/k3_docs/k3_ds.md#21-cpu-subsystem)
+
+## Floating-point reductions
+
+The GMP oracle sums exact reciprocals of integer orders or exact products
+of binary64 inputs. It rounds the sum once to nearest, ties to even.
+ULP distance compares the result to that rounded reference. The benchmark
+also computes absolute error against the unrounded rational value.
+[Floating-point audit guide](guides/rvv-oracle.md)
+
+### Native results
+
+Each rate is the median of five samples with 2,048 calls per sample.
+Each call processes 4,099 input terms. Both processes ran on CPU 0.
+Pico used GCC 14.4.1 and 256-bit vectors. The P550 used GCC 14.2.1 and
+the scalar backend. Rates count every input term, including zero orders.
+The exact reference, input generation and validation run outside the timer.
+[Benchmark source](../examples/rvv/f64_bench.c)
+
+| Workload | Pico scalar | Pico RVV ordered | Pico RVV unordered | P550 scalar | Pico ULPs, scalar / ordered / unordered |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Harmonic reciprocal sum | 110.99 | 115.17 | 115.21 | 42.38 | 18 / 18 / 7 |
+| Wide orders with zeros | 124.86 | 115.18 | 115.23 | 47.69 | 47 / 47 / 20 |
+| Signed weighted sum with cancellation | 650.71 | 651.83 | 1,203.66 | 349.42 | 46,544,526,227,013,632 / 46,544,526,227,013,632 / 4,473,582,959,932,211,200 |
+
+Rates are in million terms per second. The P550's results matched Pico's
+scalar results bit for bit.
+
+The reciprocal loop loads unsigned 32-bit orders using `e32,m4` and
+widens them exactly to binary64 in `e64,m8`. Both configurations have the
+same lane capacity, up to 32 terms per chunk on Pico. Masked
+`vfrdiv.vf` computes the reciprocals and leaves
+zeros in the lanes for zero orders. The weighted loop uses `vfmul.vv`
+and rounds each product before reduction. `vfredosum.vs` adds each term
+in input order. `vfredusum.vs` may regroup the terms within a chunk.
+[RVV source](../c/src/rvv/f64.c) ·
+[RISC-V V reductions](https://docs.riscv.org/reference/isa/v20240411/_attachments/riscv-unprivileged.pdf)
+
+On Pico, unordered RVV reduced the measured ULP error for both reciprocal
+workloads. Its throughput ranged from 0.92× to 1.04× scalar throughput.
+For the weighted case it was 1.85× as fast. The exact weighted sum was
+`1367 × 2^-40`. Scalar and ordered RVV returned `2^-40` and unordered RVV
+returned zero. Their absolute errors were about `1.2424e-9` and
+`1.2433e-9`, respectively. Both lost almost the entire answer, despite
+the small absolute error. This is why the benchmark reports both ULP
+distance and absolute error for signed inputs.
+
+### QEMU accuracy at three vector lengths
+
+Clang 18.1.3 cross-built the conformance test, and QEMU 8.2.2 ran it at each
+vector length. All three backends gave the same result on each supplied
+workload in this emulator run. The table reports the distance from the
+expected binary64 value for the unordered kernel.
+
+| VLEN | Harmonic ULPs | Wide-order ULPs | Signed cancellation ULPs |
+| ---: | ---: | ---: | ---: |
+| 128 bits | 18 | 47 | 46,544,526,227,013,632 |
+| 256 bits | 18 | 47 | 46,544,526,227,013,632 |
+| 512 bits | 18 | 47 | 46,544,526,227,013,632 |
+
+The absolute distance from the rounded reference in the cancellation
+case was `1.2424e-9` at all three lengths. Pico's unordered path produced
+different values even at the same 256-bit VLEN. These emulator runs
+exercise vector lengths and tails for correctness. The throughput
+figures come from native hardware.
+[Conformance cases](../c/tests/f64_vectors.c)

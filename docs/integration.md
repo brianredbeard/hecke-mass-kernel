@@ -79,6 +79,12 @@ both backends, explains their instructions, and records the X100 and P550
 measurements. [RISC-V hardware benchmarks](benchmarks.md) ·
 [K3 matrix hardware demo](../examples/k3-ime/README.md)
 
+The same build exposes approximate binary64 reciprocal and weighted sums
+through `<hecke_mass/f64.h>`. Use the separately named scalar, ordered,
+and unordered entry points to compare accumulation behavior. The
+GMP-backed benchmark compares each against the exact rational total and
+times only the approximate kernels. [Floating-point audit guide](guides/rvv-oracle.md)
+
 For a Linux cross-build, CI uses Clang 18, a RISC-V GNU cross toolchain, and
 QEMU user-mode emulation on Ubuntu 24.04. Set
 `HECKE_MASS_BUILD_FINITE_KERNEL=OFF` for a build without target GMP.

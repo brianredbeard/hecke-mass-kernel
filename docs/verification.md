@@ -52,3 +52,10 @@ Native checks on Pico also replayed the Brandt counts and compared every
 entry of both K3 matrix products with scalar arithmetic. The hardware
 benchmarks check the timed workloads against exact counts or products.
 [Native measurements and methodology](benchmarks.md)
+
+The binary64 tests check exact rounding at ties, subnormals and overflow
+with the GMP oracle. The GMP-free fixtures check known rounded reference
+values, require scalar and ordered RVV to agree bit for bit on the supplied
+cases, and check unordered error within case-specific bounds. QEMU runs
+those fixtures at all three configured vector lengths.
+[Rounding and error metrics](guides/rvv-oracle.md)

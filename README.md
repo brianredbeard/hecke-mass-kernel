@@ -60,6 +60,11 @@ single-core measurements on a fixed input buffer or prepared tiles.
 [Hardware walkthrough and reproduction commands](docs/benchmarks.md) ·
 [K3 matrix demo](examples/k3-ime/README.md)
 
+The binary64 benchmark compares scalar and RVV reductions against
+exact rational sums. On Pico, unordered RVV was **1.85×** as fast on the
+signed weighted workload, while cancellation erased the exact result.
+[Floating-point throughput and error](docs/benchmarks.md#floating-point-reductions)
+
 ## Worked examples
 
 The [six runnable examples](examples/rust/README.md) apply the two
