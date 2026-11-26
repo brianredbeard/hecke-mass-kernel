@@ -4,9 +4,9 @@ These two silent films introduce the arithmetic without assuming any number theo
 
 ## 1. What the kernel computes
 
-[![Frame from the first explainer](what_the_kernel_computes.png)](what_the_kernel_computes.mp4)
+[![Frame from the first explainer](what_the_kernel_computes.png)](https://brianredbeard.com/blog/hecke-mass-kernel/#what-the-kernel-computes)
 
-[Play the film (8:48)](what_the_kernel_computes.mp4) · [Read the transcript](what_the_kernel_computes.md) · [Download WebVTT captions](what_the_kernel_computes.vtt)
+[Play the film on the blog (8:48)](https://brianredbeard.com/blog/hecke-mass-kernel/#what-the-kernel-computes) · [Read the transcript](what_the_kernel_computes.md) · [Download WebVTT captions](what_the_kernel_computes.vtt)
 
 The video opens with the result it builds toward: mixing numbers between neighbours and counting solutions of an equation both give −2. Each part then uses what the previous one produced.
 
@@ -28,9 +28,9 @@ cargo run --locked --manifest-path examples/rust/Cargo.toml --example isogeny_gr
 
 ## 2. Where the proof uses it
 
-[![Frame from the second explainer](where_the_proof_uses_it.png)](where_the_proof_uses_it.mp4)
+[![Frame from the second explainer](where_the_proof_uses_it.png)](https://brianredbeard.com/blog/hecke-mass-kernel/#where-the-proof-uses-it)
 
-[Play the film (2:48)](where_the_proof_uses_it.mp4) · [Read the transcript](where_the_proof_uses_it.md) · [Download WebVTT captions](where_the_proof_uses_it.vtt)
+[Play the film on the blog (2:48)](https://brianredbeard.com/blog/hecke-mass-kernel/#where-the-proof-uses-it) · [Read the transcript](where_the_proof_uses_it.md) · [Download WebVTT captions](where_the_proof_uses_it.vtt)
 
 The sequel opens on the same two worked calls, shows the scale of Alpöge's frozen 17.4-million-line archive (`175,187` modules, `1,478,219` reachable declarations) with the caveat that reachability is not logical necessity, follows each path into the formalization ([source and citations](../references.md)), and closes with the formal upstream bridge (`bridge/UpstreamEquivalence.lean`) and 270 replayed matrix entries beyond level 11.
 
@@ -50,4 +50,10 @@ uv pip install manim
 sh docs/manim/render.sh
 ```
 
-The script renders at 1920×1080 and 30 fps under `build/manim/`. It publishes the H.264 video, the poster selected in the scene, WebVTT captions and a Markdown transcript next to each source. The caption file and transcript use the same text and scene clock as the on-screen narration. To rebuild one film, pass `what_the_kernel_computes` or `where_the_proof_uses_it` as the script argument.
+The script renders at 1920×1080 and 30 fps. It writes each H.264 video to
+`build/manim/release/<film>/<film>.mp4` and copies the poster, WebVTT
+captions and Markdown transcript next to the scene source. The captions
+and transcript share the text and timing of the on-screen narration.
+Chapter links seek directly into the blog-hosted videos. To render one
+film, pass `what_the_kernel_computes` or `where_the_proof_uses_it` as the
+script argument.

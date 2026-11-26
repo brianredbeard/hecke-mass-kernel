@@ -2,7 +2,7 @@
 
 ## Opening
 
-[0:00 in the video](what_the_kernel_computes.mp4#t=0.000)
+[0:00 in the video](https://brianredbeard.com/blog/hecke-mass-kernel/what_the_kernel_computes.mp4#t=0.000)
 
 Two computations that look unrelated: mixing numbers between neighbours, and counting the solutions of an equation.
 
@@ -10,7 +10,7 @@ Both reveal the same number, −2. This video explains why, and shows the two sm
 
 ## Part 1 of 4: fair counting
 
-[0:14 in the video](what_the_kernel_computes.mp4#t=14.167)
+[0:14 in the video](https://brianredbeard.com/blog/hecke-mass-kernel/what_the_kernel_computes.mp4#t=14.167)
 
 Start with a square. Switch each corner on or off: 16 markings.
 
@@ -38,7 +38,7 @@ Provided the classes are valid, distinct and correctly weighted, the list is com
 
 ## Part 2 of 4: mixing over neighbours
 
-[1:50 in the video](what_the_kernel_computes.mp4#t=110.367)
+[1:50 in the video](https://brianredbeard.com/blog/hecke-mass-kernel/what_the_kernel_computes.mp4#t=110.367)
 
 To picture a neighbour, start with an integer lattice. The marked point is the origin, with coordinates (0, 0).
 
@@ -76,7 +76,7 @@ The loop is a real step whose result is equivalent to A. None of B's three steps
 
 ## The Brandt matrix
 
-[4:17 in the video](what_the_kernel_computes.mp4#t=257.600)
+[4:17 in the video](https://brianredbeard.com/blog/hecke-mass-kernel/what_the_kernel_computes.mp4#t=257.600)
 
 Now turn the arrows into numbers. Each class has its list of three neighbours, already sorted into classes.
 
@@ -112,7 +112,7 @@ Both coordinates are multiplied by −2. This common scale factor is the Hecke e
 
 ## Part 3 of 4: counting points on the curve
 
-[6:40 in the video](what_the_kernel_computes.mp4#t=400.467)
+[6:40 in the video](https://brianredbeard.com/blog/hecke-mass-kernel/what_the_kernel_computes.mp4#t=400.467)
 
 Now the other side: an equation that appears to have nothing to do with our neighbour graph.
 
@@ -134,7 +134,7 @@ They agree at every prime of good reduction: for this curve, every prime except 
 
 ## Part 4 of 4: the software
 
-[7:52 in the video](what_the_kernel_computes.mp4#t=472.400)
+[7:52 in the video](https://brianredbeard.com/blog/hecke-mass-kernel/what_the_kernel_computes.mp4#t=472.400)
 
 We used Gross’s table at level 11. The two classes A and B correspond to the supersingular elliptic curves mod 11, with j = 1 and j = 0.
 
@@ -146,7 +146,7 @@ The Rust example finds these edges independently from Φ₂ mod 11. The detailed
 
 ## Recap
 
-[8:30 in the video](what_the_kernel_computes.mp4#t=510.367)
+[8:30 in the video](https://brianredbeard.com/blog/hecke-mass-kernel/what_the_kernel_computes.mp4#t=510.367)
 
 Counting B destinations gives the entry 2. Mixing the whole vector gives the factor −2, the same number we found by counting points.
 

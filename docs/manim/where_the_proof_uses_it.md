@@ -2,7 +2,7 @@
 
 ## Opening
 
-[0:00 in the video](where_the_proof_uses_it.mp4#t=0.000)
+[0:00 in the video](https://brianredbeard.com/blog/hecke-mass-kernel/where_the_proof_uses_it.mp4#t=0.000)
 
 We followed two chains of references from the declaration named riemannHypothesis in Alpöge’s Lean source.
 
@@ -10,7 +10,7 @@ In the proof, the first enters a volume identity and the second a compatibility 
 
 ## Sifting a 17-million-line graph
 
-[0:15 in the video](where_the_proof_uses_it.mp4#t=15.800)
+[0:15 in the video](https://brianredbeard.com/blog/hecke-mass-kernel/where_the_proof_uses_it.mp4#t=15.800)
 
 The original archive spans 175,187 modules and reaches almost 1.5 million declarations from riemannHypothesis.
 
@@ -20,7 +20,7 @@ Reachability in that frozen build shows what this formalization actually routed 
 
 ## Reading a source reference
 
-[0:38 in the video](where_the_proof_uses_it.mp4#t=38.700)
+[0:38 in the video](https://brianredbeard.com/blog/hecke-mass-kernel/where_the_proof_uses_it.mp4#t=38.700)
 
 In the definition of HeckeAt, rd g is the value being specified. On the right, ρ.hecke applies the Hecke operator to rd f.
 
@@ -28,7 +28,7 @@ That reference gives one edge from HeckeAt to Setup.hecke. Watch where it sits i
 
 ## Two paths from the root declaration
 
-[0:54 in the video](where_the_proof_uses_it.mp4#t=54.667)
+[0:54 in the video](https://brianredbeard.com/blog/hecke-mass-kernel/where_the_proof_uses_it.mp4#t=54.667)
 
 The highlighted reference ends the blue path. Both paths start at riemannHypothesis and share their first eight links.
 
@@ -36,7 +36,7 @@ From the fork, the amber branch reaches classMass in 15 links; the blue branch r
 
 ## Mass becomes a volume identity
 
-[1:11 in the video](where_the_proof_uses_it.mp4#t=71.467)
+[1:11 in the video](https://brianredbeard.com/blog/hecke-mass-kernel/where_the_proof_uses_it.mp4#t=71.467)
 
 In part 1, the masses of A and B filled a bar: 1/4 + 1/6 = 5/12.
 
@@ -48,7 +48,7 @@ And because every omitted class adds positive weight, matching the volume certif
 
 ## Hecke becomes a compatibility condition
 
-[1:41 in the video](where_the_proof_uses_it.mp4#t=101.967)
+[1:41 in the video](https://brianredbeard.com/blog/hecke-mass-kernel/where_the_proof_uses_it.mp4#t=101.967)
 
 Keep A’s three neighbours in view. Counting the B destinations gives the matrix entry 2.
 
@@ -60,7 +60,7 @@ The series construction copies that setup so it can match forms to series coeffi
 
 ## The formal bridge and replayed cases
 
-[2:13 in the video](where_the_proof_uses_it.mp4#t=133.067)
+[2:13 in the video](https://brianredbeard.com/blog/hecke-mass-kernel/where_the_proof_uses_it.mp4#t=133.067)
 
 To check the arithmetic without compiling all 175,187 modules, the repo separates the standalone Lean kernel from a formal bridge.
 
@@ -68,7 +68,7 @@ The bridge ties the rational formulas to Alpöge’s exact definitions, while 27
 
 ## What each sum does
 
-[2:29 in the video](where_the_proof_uses_it.mp4#t=149.367)
+[2:29 in the video](https://brianredbeard.com/blog/hecke-mass-kernel/where_the_proof_uses_it.mp4#t=149.367)
 
 So that is where the two sums enter the proof. One identifies a volume and pins completeness.
 

@@ -22,7 +22,7 @@ render() {
     -c:v libx264 -preset veryslow -crf 24 -tune animation -pix_fmt yuv420p \
     -movflags +faststart "$prefix.mp4"
   ffmpeg -v error -y -ss "$(cat "$prefix.poster-time")" -i "$master" -frames:v 1 "$prefix.png"
-  cp "$prefix.mp4" "$prefix.png" "$prefix.vtt" "$prefix.md" docs/manim/
+  cp "$prefix.png" "$prefix.vtt" "$prefix.md" docs/manim/
 }
 
 case "${1:-all}" in

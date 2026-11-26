@@ -31,6 +31,7 @@ CURVE = "#c297ff"
 
 SUBTITLE_Y = -3.12
 SECONDS_PER_WORD = 0.3
+VIDEO_BASE_URL = "https://brianredbeard.com/blog/hecke-mass-kernel/"
 
 
 def lines(
@@ -146,6 +147,7 @@ class Explainer(Scene):
             raise ValueError("The scene needs a poster frame")
         prefix = Path(export)
         title = prefix.name.replace("_", " ").capitalize()
+        video_url = f"{VIDEO_BASE_URL}{prefix.name}.mp4"
         vtt = ["WEBVTT", ""]
         transcript = [f"# {title}", ""]
         chapter = None
@@ -164,7 +166,7 @@ class Explainer(Scene):
                     [
                         f"## {heading}",
                         "",
-                        f"[{minute}:{second:02} in the video]({prefix.name}.mp4#t={start:.3f})",
+                        f"[{minute}:{second:02} in the video]({video_url}#t={start:.3f})",
                         "",
                     ]
                 )

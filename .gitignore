@@ -11,6 +11,7 @@
 /rust/Cargo.lock
 /.venv/
 /media/
+/docs/manim/*.mp4
 /.ruff_cache/
 target/
 __pycache__/
