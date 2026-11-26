@@ -5,6 +5,11 @@ static int valid_nonneg_mpz(mpz_srcptr value)
     return value != NULL && mpz_sgn(value) >= 0;
 }
 
+static int valid_pos_mpz(mpz_srcptr value)
+{
+    return value != NULL && mpz_sgn(value) > 0;
+}
+
 static int valid_mpq(mpq_srcptr value)
 {
     return value != NULL && mpz_sgn(mpq_denref(value)) > 0;
@@ -114,6 +119,35 @@ void hecke_mass_class_mass(mpq_ptr result, const mpz_srcptr orders[], size_t cou
         result != NULL) {
         mpq_set_ui(result, 0, 1);
     }
+}
+
+hecke_mass_status hecke_mass_orbit_deficit_checked(mpq_ptr deficit, mpq_ptr covered,
+                                                   mpz_srcptr group_order,
+                                                   const mpz_srcptr orders[],
+                                                   size_t count,
+                                                   mpq_srcptr expected_total)
+{
+    if (deficit == NULL || covered == NULL || deficit == covered ||
+        !valid_pos_mpz(group_order) || !valid_mpq(expected_total) ||
+        mpq_sgn(expected_total) < 0 || (count != 0 && orders == NULL)) {
+        return HECKE_MASS_ERR_INVALID_ARGUMENT;
+    }
+    for (size_t i = 0; i < count; ++i) {
+        if (!valid_pos_mpz(orders[i])) {
+            return HECKE_MASS_ERR_INVALID_ARGUMENT;
+        }
+    }
+
+    mpq_t coverage, difference;
+    mpq_inits(coverage, difference, NULL);
+    sum_reciprocals_range(difference, orders, 0, count);
+    mpq_set_z(coverage, group_order);
+    mpq_mul(coverage, coverage, difference);
+    mpq_sub(difference, expected_total, coverage);
+    mpq_swap(deficit, difference);
+    mpq_swap(covered, coverage);
+    mpq_clears(coverage, difference, NULL);
+    return HECKE_MASS_OK;
 }
 
 hecke_mass_status hecke_mass_hecke_checked(mpq_ptr result, mpq_srcptr u,

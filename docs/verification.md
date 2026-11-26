@@ -13,7 +13,15 @@ cd lean
 lake build
 ```
 
-`lake build` builds the library, `HeckeMassKernel.ReplayedCases`, and both vector-generator executables.
+`lake build` builds the library and the three vector-generator executables.
+
+The orbit audit computes exact covered count and signed deficit for positive
+group and stabilizer orders. `orbitCompleteness_eq_some_iff` states the
+validation rules and arithmetic result. `orbitCompleteness_complete_of_extension`
+proves that matching the full count rules out a nonempty extension by orbits
+with positive stabilizer orders. Applying that theorem to a generator
+requires evidence that its inputs describe distinct orbits and that its
+expected count describes the same family of labeled objects.
 
 ## Shared fixtures
 
@@ -25,10 +33,17 @@ mkdir -p build
   cp build/scaffold.csv tests/vectors/scaffold.csv
 (cd lean && lake exe kernel_vectors) > build/kernel.tsv &&
   cp build/kernel.tsv tests/vectors/kernel.tsv
+(cd lean && lake exe orbit_vectors) > build/orbit.tsv &&
+  cp build/orbit.tsv tests/vectors/orbit.tsv
 ```
 
 `tests/vectors/kernel.tsv` has three tab-separated columns for the operation, space-separated inputs and reduced rational output. For `mass` the inputs are the orders. For `hecke` the first four inputs are `u q k rank`, followed by the samples. The synthetic cases cover edge semantics including odd higher rank with even $k$ (distinguishing $k\lfloor r/2\rfloor$ from $\lfloor kr/2\rfloor$), fractional characters and samples with $q^e > 1$, $0^0 = 1$ via both $k=0$ and $\text{rank}=1$, arbitrary-precision $k$ and $\text{rank} > 2^{64}$, and zero-short-circuiting on huge exponents. The C and Rust integration tests run every row against their public APIs.
 
 [Replayed cases](replayed-cases.md) identifies the recorded masses and matrices included in these fixtures and what the replay does and does not establish.
+
+`tests/vectors/orbit.tsv` records the group order, expected total, stabilizer
+orders, covered count, signed deficit, and status. It includes matching
+tables, missing and extra entries, fractional coverage, and integers beyond
+machine and binary64 precision. The C and Rust suites replay every row.
 
 CI compares freshly generated fixtures with the checked-in files. The C suite tests both Release and ASan/UBSan builds (with `-Wall -Wextra -Werror`), exercises checked invalid-input rejection, pointer aliasing, and permutation invariance, and builds the installed CMake consumer requiring `COMPONENTS FiniteKernel`. The Rust suite runs unit tests, doctests, randomized property checks, fixture replay, and all six worked examples. The RVV job runs the scaffold test under QEMU at two vector lengths. The Lean theorems apply to the Lean reference.

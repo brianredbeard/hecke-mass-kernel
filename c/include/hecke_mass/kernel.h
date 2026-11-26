@@ -33,6 +33,22 @@ hecke_mass_status hecke_mass_class_mass_checked(mpq_ptr result,
 
 void hecke_mass_class_mass(mpq_ptr result, const mpz_srcptr orders[], size_t count);
 
+/*
+ * Audit orbit coverage. Write group_order * class_mass(orders) to covered and
+ * expected_total - covered to deficit. A positive deficit means missing
+ * coverage, zero means equal coverage, and a negative deficit means excess.
+ *
+ * group_order and every stabilizer order must be positive, and expected_total
+ * must be nonnegative. Stabilizer orders need not divide group_order.
+ * Both outputs must be initialized and distinct. Either may alias an input.
+ * The outputs retain their previous values on invalid arguments.
+ */
+hecke_mass_status hecke_mass_orbit_deficit_checked(mpq_ptr deficit, mpq_ptr covered,
+                                                   mpz_srcptr group_order,
+                                                   const mpz_srcptr orders[],
+                                                   size_t count,
+                                                   mpq_srcptr expected_total);
+
 /* Sum samples and divide by u and q^(k * floor(rank/2)), with inv(0) = 0. */
 hecke_mass_status hecke_mass_hecke_checked(mpq_ptr result, mpq_srcptr u,
                                            mpz_srcptr q, mpz_srcptr k,

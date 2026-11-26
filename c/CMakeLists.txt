@@ -81,7 +81,8 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
             add_executable(hecke_mass_kernel_vectors tests/kernel_vectors.c)
             target_link_libraries(hecke_mass_kernel_vectors PRIVATE HeckeMass::hecke_mass)
             add_test(NAME kernel_vectors COMMAND hecke_mass_kernel_vectors
-                "${CMAKE_CURRENT_SOURCE_DIR}/../tests/vectors/kernel.tsv")
+                "${CMAKE_CURRENT_SOURCE_DIR}/../tests/vectors/kernel.tsv"
+                "${CMAKE_CURRENT_SOURCE_DIR}/../tests/vectors/orbit.tsv")
         endif()
     endif()
 endif()

@@ -50,6 +50,10 @@ def inv (a : Frac) : Frac :=
 
 def reciprocalNat (n : Nat) : Frac := (integer n).inv
 
+def neg (a : Frac) : Frac := ⟨-a.num, a.den, a.positive⟩
+
+def sub (a b : Frac) : Frac := a.add b.neg
+
 private def sumPairs : List Frac → List Frac
   | [] => []
   | [x] => [x]
@@ -871,5 +875,246 @@ theorem hecke_minus_two :
 theorem hecke_odd_rank_even_k :
     hecke (Frac.integer 1) 3 2 5 [Frac.integer 1] = ⟨1, 81, by decide⟩ := by
   decide
+
+-- Audit primitives: orbit-stabilizer completeness, detailed balance, and matrix commutativity.
+
+namespace Frac
+
+theorem neg_equiv_neg {a b : Frac} (h : a ≈ b) : a.neg ≈ b.neg := by
+  unfold Equiv neg at *
+  dsimp only
+  rw [Int.neg_mul, Int.neg_mul, h]
+
+theorem sub_congr {a₁ a₂ b₁ b₂ : Frac} (ha : a₁ ≈ a₂) (hb : b₁ ≈ b₂) :
+    a₁.sub b₁ = a₂.sub b₂ :=
+  add_congr ha (neg_equiv_neg hb)
+
+theorem sub_self (a : Frac) : a.sub a = integer 0 := by
+  rw [← reduce_integer 0]
+  unfold sub
+  apply eq_of_equiv_of_gcd_one (reduce_gcd_one _) (reduce_gcd_one _)
+  apply (add_equiv_raw a a.neg).trans
+  apply Equiv.trans _ (reduce_equiv (integer 0)).symm
+  unfold Equiv neg integer
+  dsimp only
+  rw [Int.neg_mul, Int.add_right_neg, Int.zero_mul, Int.zero_mul]
+
+theorem equiv_of_sub_eq_zero {a b : Frac} (h : a.sub b = integer 0) : a ≈ b := by
+  have hraw := add_equiv_raw a b.neg
+  rw [show a.add b.neg = a.sub b from rfl, h] at hraw
+  unfold Equiv at hraw ⊢
+  dsimp only [integer, neg] at hraw
+  rw [Int.zero_mul, Int.neg_mul] at hraw
+  have h1 : (0 : Int) = a.num * (b.den : Int) + -(b.num * (a.den : Int)) := by
+    simpa [Int.mul_one] using hraw
+  omega
+
+theorem sub_eq_zero_iff_equiv {a b : Frac} : a.sub b = integer 0 ↔ a ≈ b :=
+  ⟨equiv_of_sub_eq_zero, fun h => by rw [sub_congr h (Equiv.refl b), sub_self]⟩
+
+theorem lt_of_equiv_of_lt {a₁ a₂ b₁ b₂ : Frac}
+    (ha : a₁ ≈ a₂) (hb : b₁ ≈ b₂) (hlt : a₂ < b₂) : a₁ < b₁ := by
+  change a₁.num * (b₁.den : Int) < b₁.num * (a₁.den : Int)
+  change a₂.num * (b₂.den : Int) < b₂.num * (a₂.den : Int) at hlt
+  unfold Equiv at ha hb
+  have hpos_a2 : (0 : Int) < (a₂.den : Int) := positiveIntCast a₂.positive
+  have hpos_b2 : (0 : Int) < (b₂.den : Int) := positiveIntCast b₂.positive
+  have hpos_a1 : (0 : Int) < (a₁.den : Int) := positiveIntCast a₁.positive
+  have hpos_b1 : (0 : Int) < (b₁.den : Int) := positiveIntCast b₁.positive
+  have hmul : (a₁.num * (b₁.den : Int)) * ((a₂.den : Int) * (b₂.den : Int)) <
+      (b₁.num * (a₁.den : Int)) * ((a₂.den : Int) * (b₂.den : Int)) := by
+    have lhs_eq : (a₁.num * (b₁.den : Int)) * ((a₂.den : Int) * (b₂.den : Int)) =
+        (a₂.num * (b₂.den : Int)) * ((a₁.den : Int) * (b₁.den : Int)) := by
+      calc
+        (a₁.num * (b₁.den : Int)) * ((a₂.den : Int) * (b₂.den : Int))
+          = (a₁.num * (a₂.den : Int)) * ((b₁.den : Int) * (b₂.den : Int)) := by
+              rw [Int.mul_assoc, ← Int.mul_assoc (b₁.den : Int), Int.mul_comm (b₁.den : Int) (a₂.den : Int),
+                  Int.mul_assoc (a₂.den : Int), ← Int.mul_assoc]
+        _ = (a₂.num * (a₁.den : Int)) * ((b₁.den : Int) * (b₂.den : Int)) := by rw [ha]
+        _ = (a₂.num * (b₂.den : Int)) * ((a₁.den : Int) * (b₁.den : Int)) := by
+              rw [Int.mul_assoc, ← Int.mul_assoc (a₁.den : Int), Int.mul_comm (a₁.den : Int) (b₁.den : Int),
+                  Int.mul_assoc (b₁.den : Int), Int.mul_comm (a₁.den : Int) (b₂.den : Int),
+                  ← Int.mul_assoc (b₁.den : Int), Int.mul_comm (b₁.den : Int) (b₂.den : Int),
+                  Int.mul_assoc (b₂.den : Int), ← Int.mul_assoc, Int.mul_comm (b₁.den : Int) (a₁.den : Int)]
+    have rhs_eq : (b₁.num * (a₁.den : Int)) * ((a₂.den : Int) * (b₂.den : Int)) =
+        (b₂.num * (a₂.den : Int)) * ((a₁.den : Int) * (b₁.den : Int)) := by
+      calc
+        (b₁.num * (a₁.den : Int)) * ((a₂.den : Int) * (b₂.den : Int))
+          = (b₁.num * (b₂.den : Int)) * ((a₁.den : Int) * (a₂.den : Int)) := by
+              rw [Int.mul_assoc, Int.mul_comm (a₂.den : Int) (b₂.den : Int),
+                  ← Int.mul_assoc (a₁.den : Int), Int.mul_comm (a₁.den : Int) (b₂.den : Int),
+                  Int.mul_assoc (b₂.den : Int), ← Int.mul_assoc]
+        _ = (b₂.num * (b₁.den : Int)) * ((a₁.den : Int) * (a₂.den : Int)) := by rw [hb]
+        _ = (b₂.num * (a₂.den : Int)) * ((a₁.den : Int) * (b₁.den : Int)) := by
+              rw [Int.mul_assoc, Int.mul_comm (a₁.den : Int) (a₂.den : Int),
+                  ← Int.mul_assoc (b₁.den : Int), Int.mul_comm (b₁.den : Int) (a₂.den : Int),
+                  Int.mul_assoc (a₂.den : Int), ← Int.mul_assoc, Int.mul_comm (b₁.den : Int) (a₁.den : Int)]
+    rw [lhs_eq, rhs_eq]
+    exact Int.mul_lt_mul_of_pos_right hlt (Int.mul_pos hpos_a1 hpos_b1)
+  apply Decidable.byContradiction
+  intro hle
+  have hge : b₁.num * (a₁.den : Int) ≤ a₁.num * (b₁.den : Int) := by omega
+  have hge' := Int.mul_le_mul_of_nonneg_right hge (Int.le_of_lt (Int.mul_pos hpos_a2 hpos_b2))
+  omega
+
+end Frac
+
+/-- Total labeled count covered by `orders` under a group of size `groupOrder`:
+`|G| * classMass(orders)`. -/
+def orbitCovered (groupOrder : Nat) (orders : List Nat) : Frac :=
+  (Frac.integer groupOrder).mul (classMass orders)
+
+/-- Exact rational deficit `expectedTotal - |G| * classMass(orders)`.
+Zero iff the covered count matches `expectedTotal`. -/
+def orbitDeficit (groupOrder : Nat) (orders : List Nat) (expectedTotal : Frac) : Frac :=
+  expectedTotal.sub (orbitCovered groupOrder orders)
+
+theorem orbitCovered_perm (groupOrder : Nat) {xs ys : List Nat} (h : xs.Perm ys) :
+    orbitCovered groupOrder xs = orbitCovered groupOrder ys := by
+  unfold orbitCovered
+  rw [classMass_perm h]
+
+theorem orbitDeficit_perm (groupOrder : Nat) {xs ys : List Nat} (h : xs.Perm ys)
+    (expectedTotal : Frac) :
+    orbitDeficit groupOrder xs expectedTotal = orbitDeficit groupOrder ys expectedTotal := by
+  unfold orbitDeficit
+  rw [orbitCovered_perm groupOrder h]
+
+theorem orbitCovered_strict_lt_of_pos {groupOrder : Nat} (hg : 0 < groupOrder)
+    {found extra : List Nat} {d : Nat} (hmem : d ∈ extra) (hpos : 0 < d) :
+    orbitCovered groupOrder found < orbitCovered groupOrder (found ++ extra) := by
+  unfold orbitCovered
+  let raw1 : Frac := ⟨(groupOrder : Int) * (classMass found).num, (classMass found).den,
+    (classMass found).positive⟩
+  let raw2 : Frac := ⟨(groupOrder : Int) * (classMass (found ++ extra)).num,
+    (classMass (found ++ extra)).den, (classMass (found ++ extra)).positive⟩
+  have h1 : (Frac.integer groupOrder).mul (classMass found) ≈ raw1 := by
+    have := Frac.reduce_equiv ⟨(Frac.integer groupOrder).num * (classMass found).num,
+      (Frac.integer groupOrder).den * (classMass found).den,
+      Nat.mul_pos (Frac.integer groupOrder).positive (classMass found).positive⟩
+    simpa [Frac.mul, Frac.integer, raw1] using this
+  have h2 : (Frac.integer groupOrder).mul (classMass (found ++ extra)) ≈ raw2 := by
+    have := Frac.reduce_equiv ⟨(Frac.integer groupOrder).num * (classMass (found ++ extra)).num,
+      (Frac.integer groupOrder).den * (classMass (found ++ extra)).den,
+      Nat.mul_pos (Frac.integer groupOrder).positive (classMass (found ++ extra)).positive⟩
+    simpa [Frac.mul, Frac.integer, raw2] using this
+  apply Frac.lt_of_equiv_of_lt h1 h2
+  change raw1.num * (raw2.den : Int) < raw2.num * (raw1.den : Int)
+  dsimp only [raw1, raw2]
+  have hlt := classMass_lt_append_of_pos (found := found) hmem hpos
+  change (classMass found).num * ((classMass (found ++ extra)).den : Int) <
+    (classMass (found ++ extra)).num * ((classMass found).den : Int) at hlt
+  rw [Int.mul_assoc, Int.mul_assoc]
+  exact Int.mul_lt_mul_of_pos_left hlt (positiveIntCast hg)
+
+/-- Orbit-stabilizer completeness: if `0 < groupOrder`, every omitted orbit has positive
+stabilizer order, and `orbitDeficit` vanishes against the full total, then `extra` is empty. -/
+theorem orbitComplete_of_eq {groupOrder : Nat} (hg : 0 < groupOrder)
+    {found extra : List Nat} (hpos : ∀ d ∈ extra, 0 < d)
+    (heq : orbitDeficit groupOrder found (orbitCovered groupOrder (found ++ extra)) = Frac.integer 0) :
+    extra = [] := by
+  unfold orbitDeficit at heq
+  rw [Frac.sub_eq_zero_iff_equiv] at heq
+  cases extra with
+  | nil => rfl
+  | cons d rest =>
+    exfalso
+    have hmem : d ∈ d :: rest := List.mem_cons_self
+    have hlt := orbitCovered_strict_lt_of_pos hg (found := found) hmem (hpos d hmem)
+    exact Frac.not_equiv_of_lt hlt heq.symm
+
+inductive OrbitStatus where
+  | complete
+  | missing (amount : Frac)
+  | excess (amount : Frac)
+  deriving DecidableEq
+
+structure OrbitAudit where
+  covered : Frac
+  deficit : Frac
+  deriving DecidableEq
+
+/-- The status carries the positive magnitude when the signed deficit is nonzero. -/
+def OrbitAudit.status (audit : OrbitAudit) : OrbitStatus :=
+  if audit.deficit.num = 0 then .complete
+  else if 0 < audit.deficit.num then .missing audit.deficit
+  else .excess audit.deficit.neg
+
+/-- Audit positive stabilizer orders against a nonnegative target. A positive
+order need not divide the group order, so the deficit can expose fractional coverage. -/
+def orbitCompleteness (groupOrder : Nat) (orders : List Nat) (expectedTotal : Frac) :
+    Option OrbitAudit :=
+  if 0 < groupOrder ∧ (∀ d ∈ orders, 0 < d) ∧ 0 ≤ expectedTotal.num then
+    let covered := orbitCovered groupOrder orders
+    some ⟨covered, expectedTotal.sub covered⟩
+  else none
+
+theorem OrbitAudit.status_complete_iff (audit : OrbitAudit) :
+    audit.status = .complete ↔ audit.deficit.num = 0 := by
+  unfold status
+  split <;> rename_i h
+  · simp [h]
+  · split <;> simp [h]
+
+theorem orbitCompleteness_eq_some_iff {groupOrder : Nat} {orders : List Nat}
+    {expectedTotal : Frac} {audit : OrbitAudit} :
+    orbitCompleteness groupOrder orders expectedTotal = some audit ↔
+      (0 < groupOrder ∧ (∀ d ∈ orders, 0 < d) ∧ 0 ≤ expectedTotal.num) ∧
+        audit = ⟨orbitCovered groupOrder orders, orbitDeficit groupOrder orders expectedTotal⟩ := by
+  unfold orbitCompleteness orbitDeficit
+  split <;> rename_i h
+  · constructor
+    · intro heq
+      exact ⟨h, (Option.some.inj heq).symm⟩
+    · rintro ⟨_, rfl⟩
+      rfl
+  · simp [h]
+
+/-- A complete audit against the total of a list extended by positive orders
+implies the extension was empty. This uses the strict mass-stopping theorem. -/
+theorem orbitCompleteness_complete_of_extension {groupOrder : Nat} {found extra : List Nat}
+    {audit : OrbitAudit} (hpos : ∀ d ∈ extra, 0 < d)
+    (haudit : orbitCompleteness groupOrder found (orbitCovered groupOrder (found ++ extra)) =
+      some audit) (hcomplete : audit.status = .complete) : extra = [] := by
+  obtain ⟨⟨hg, _, _⟩, rfl⟩ := orbitCompleteness_eq_some_iff.mp haudit
+  have hnum := (OrbitAudit.status_complete_iff _).mp hcomplete
+  have hzero := Frac.reduce_eq_of_equiv ((Frac.equiv_zero_iff _).mpr hnum)
+  rw [Frac.reduce_integer] at hzero
+  exact orbitComplete_of_eq hg hpos (by
+    unfold orbitDeficit Frac.sub Frac.add at hzero ⊢
+    rw [Frac.reduce_idem] at hzero
+    exact hzero)
+
+/-- Check weighted detailed balance `d_j * B[i][j] = d_i * B[j][i]` for positive `orders`. -/
+def detailedBalance (orders : List Nat) (matrix : List (List Frac)) : Bool :=
+  let n := orders.length
+  matrix.length == n &&
+  orders.all (· > 0) &&
+  matrix.all (fun row => row.length == n) &&
+  (List.range n).all fun i =>
+    let rowI := matrix.getD i []
+    let dI := Frac.integer (orders.getD i 0)
+    (List.range n).all fun j =>
+      let rowJ := matrix.getD j []
+      let dJ := Frac.integer (orders.getD j 0)
+      let bij := rowI.getD j (Frac.integer 0)
+      let bji := rowJ.getD i (Frac.integer 0)
+      dJ.mul bij == dI.mul bji
+
+/-- Exact rational matrix multiplication `A * B`. -/
+def matMul (a b : List (List Frac)) : List (List Frac) :=
+  let cols := (List.range b.length).map fun j =>
+    b.map fun row => row.getD j (Frac.integer 0)
+  a.map fun row =>
+    cols.map fun col =>
+      Frac.sum ((row.zip col).map fun (x, y) => x.mul y)
+
+/-- Check exact rational matrix commutativity `A * B = B * A`. -/
+def matricesCommute (a b : List (List Frac)) : Bool :=
+  let n := a.length
+  b.length == n &&
+  a.all (fun row => row.length == n) &&
+  b.all (fun row => row.length == n) &&
+  matMul a b == matMul b a
 
 end HeckeMassKernel

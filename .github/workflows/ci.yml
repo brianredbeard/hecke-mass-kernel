@@ -22,6 +22,8 @@ jobs:
           diff -u ../tests/vectors/scaffold.csv "$RUNNER_TEMP/scaffold.csv"
           lake exe kernel_vectors > "$RUNNER_TEMP/kernel.tsv"
           diff -u ../tests/vectors/kernel.tsv "$RUNNER_TEMP/kernel.tsv"
+          lake exe orbit_vectors > "$RUNNER_TEMP/orbit.tsv"
+          diff -u ../tests/vectors/orbit.tsv "$RUNNER_TEMP/orbit.tsv"
 
   c:
     name: Portable C and installed consumer

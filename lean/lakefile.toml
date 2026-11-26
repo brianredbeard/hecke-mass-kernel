@@ -1,6 +1,6 @@
 name = "hecke_mass_kernel"
 version = "0.1.0"
-defaultTargets = ["HeckeMassKernel", "scaffold_vectors", "kernel_vectors"]
+defaultTargets = ["HeckeMassKernel", "scaffold_vectors", "kernel_vectors", "orbit_vectors"]
 
 [[lean_lib]]
 name = "HeckeMassKernel"
@@ -12,3 +12,7 @@ root = "ScaffoldVectors"
 [[lean_exe]]
 name = "kernel_vectors"
 root = "KernelVectors"
+
+[[lean_exe]]
+name = "orbit_vectors"
+root = "OrbitVectors"

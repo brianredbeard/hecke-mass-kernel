@@ -1,29 +1,35 @@
 #![forbid(unsafe_code)]
 
-//! Exact class mass and normalized Hecke arithmetic on finite tables.
+//! Exact class mass, normalized Hecke arithmetic, and orbit audits on finite tables.
 //!
-//! Both operations mirror the standalone Lean reference in
+//! The operations mirror the standalone Lean reference in
 //! `lean/HeckeMassKernel/Finite.lean`:
 //! - [`class_mass`] sums reciprocal stabilizer orders, with `0` contributing `0`.
 //! - [`hecke`] sums rational samples and scales by `u⁻¹ * (q^(k * floor(rank / 2)))⁻¹`,
 //!   using total inversion (`inv(0) = 0`) and `0^0 = 1`.
+//! - [`orbit_completeness`] compares exact orbit coverage with a supplied total.
+
+mod orbit;
 
 pub use num_bigint::{BigInt, BigUint};
 pub use num_rational::BigRational;
 use num_traits::{One, Pow, Zero};
+pub use orbit::{orbit_completeness, OrbitAccumulator, OrbitAudit, OrbitAuditError, OrbitOutcome};
+
+fn reciprocal_order(order: BigUint) -> BigRational {
+    if order.is_zero() {
+        BigRational::zero()
+    } else {
+        // `1` and any positive integer are already coprime.
+        BigRational::new_raw(BigInt::one(), BigInt::from(order))
+    }
+}
 
 /// Balanced binary-splitting sum of reciprocal positive orders in `orders`.
 fn sum_reciprocals(orders: &[BigUint]) -> BigRational {
     match orders {
         [] => BigRational::zero(),
-        [order] => {
-            if order.is_zero() {
-                BigRational::zero()
-            } else {
-                // `1` and any positive integer are already coprime.
-                BigRational::new_raw(BigInt::one(), BigInt::from(order.clone()))
-            }
-        }
+        [order] => reciprocal_order(order.clone()),
         slice => {
             let mid = slice.len() / 2;
             sum_reciprocals(&slice[..mid]) + sum_reciprocals(&slice[mid..])

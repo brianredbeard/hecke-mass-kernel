@@ -271,19 +271,147 @@ static int check_api_contracts(void)
     return ok;
 }
 
-int main(int argc, char **argv)
+static int check_orbit_api_contracts(void)
 {
-    if (argc != 2) {
-        return 1;
+    mpz_t group, four, zero, negative;
+    mpq_t covered, deficit, expected, invalid;
+    mpz_inits(group, four, zero, negative, NULL);
+    mpq_inits(covered, deficit, expected, invalid, NULL);
+    mpz_set_ui(group, 6);
+    mpz_set_ui(four, 4);
+    mpz_set_si(negative, -1);
+    mpq_set_ui(covered, 7, 1);
+    mpq_set_ui(deficit, 9, 1);
+    mpq_set_ui(expected, 2, 1);
+    mpq_set_si(invalid, -1, 2);
+
+    const mpz_srcptr orders[] = {four};
+    const mpz_srcptr zero_orders[] = {four, zero};
+    const mpz_srcptr bad_orders[] = {four, negative};
+    const mpz_srcptr null_orders[] = {four, NULL};
+    int ok = hecke_mass_orbit_deficit_checked(deficit, covered, zero, orders, 1, expected) ==
+                 HECKE_MASS_ERR_INVALID_ARGUMENT &&
+             hecke_mass_orbit_deficit_checked(deficit, covered, negative, orders, 1, expected) ==
+                 HECKE_MASS_ERR_INVALID_ARGUMENT &&
+             hecke_mass_orbit_deficit_checked(deficit, covered, group, zero_orders, 2, expected) ==
+                 HECKE_MASS_ERR_INVALID_ARGUMENT &&
+             hecke_mass_orbit_deficit_checked(deficit, covered, group, bad_orders, 2, expected) ==
+                 HECKE_MASS_ERR_INVALID_ARGUMENT &&
+             hecke_mass_orbit_deficit_checked(deficit, covered, group, null_orders, 2, expected) ==
+                 HECKE_MASS_ERR_INVALID_ARGUMENT &&
+             hecke_mass_orbit_deficit_checked(deficit, covered, group, NULL, 1, expected) ==
+                 HECKE_MASS_ERR_INVALID_ARGUMENT &&
+             hecke_mass_orbit_deficit_checked(deficit, covered, group, orders, 1, invalid) ==
+                 HECKE_MASS_ERR_INVALID_ARGUMENT &&
+             hecke_mass_orbit_deficit_checked(deficit, deficit, group, orders, 1, expected) ==
+                 HECKE_MASS_ERR_INVALID_ARGUMENT &&
+             hecke_mass_orbit_deficit_checked(NULL, covered, group, orders, 1, expected) ==
+                 HECKE_MASS_ERR_INVALID_ARGUMENT &&
+             hecke_mass_orbit_deficit_checked(deficit, NULL, group, orders, 1, expected) ==
+                 HECKE_MASS_ERR_INVALID_ARGUMENT;
+    mpz_set_ui(mpq_denref(invalid), 0);
+    ok = ok && hecke_mass_orbit_deficit_checked(deficit, covered, group, orders, 1, invalid) ==
+                   HECKE_MASS_ERR_INVALID_ARGUMENT &&
+         mpq_cmp_ui(covered, 7, 1) == 0 && mpq_cmp_ui(deficit, 9, 1) == 0;
+
+    /* Inputs may alias outputs, even through GMP's rational limbs. */
+    mpq_set(covered, expected);
+    mpq_set_ui(deficit, 6, 1);
+    ok = ok && hecke_mass_orbit_deficit_checked(deficit, covered, mpq_numref(deficit),
+                                               orders, 1, covered) == HECKE_MASS_OK &&
+         mpq_cmp_ui(covered, 3, 2) == 0 && mpq_cmp_ui(deficit, 1, 2) == 0;
+    mpq_set_ui(deficit, 0, 1);
+    ok = ok && hecke_mass_orbit_deficit_checked(deficit, covered, group, NULL, 0, deficit) ==
+                   HECKE_MASS_OK &&
+         mpq_sgn(covered) == 0 && mpq_sgn(deficit) == 0;
+
+    mpq_clears(covered, deficit, expected, invalid, NULL);
+    mpz_clears(group, four, zero, negative, NULL);
+    return ok;
+}
+
+static int check_orbit_row(char *line)
+{
+    char *columns[6];
+    columns[0] = line;
+    for (size_t i = 1; i < sizeof(columns) / sizeof(columns[0]); ++i) {
+        char *tab = strchr(columns[i - 1], '\t');
+        if (tab == NULL) {
+            return 0;
+        }
+        *tab = '\0';
+        columns[i] = tab + 1;
     }
-    if (!check_api_contracts()) {
-        fprintf(stderr, "C API contract checks failed\n");
-        return 1;
+    char *order_text = columns[2];
+    char *expected_status = columns[5];
+    expected_status[strcspn(expected_status, "\r\n")] = '\0';
+
+    size_t count = 0;
+    if (strcmp(order_text, "-") != 0) {
+        count = 1;
+        for (const char *ch = order_text; *ch != '\0'; ++ch) {
+            if (*ch == ',') {
+                ++count;
+            }
+        }
     }
-    FILE *fixtures = fopen(argv[1], "r");
+    mpz_t *orders = count ? calloc(count, sizeof(*orders)) : NULL;
+    mpz_srcptr *inputs = count ? calloc(count, sizeof(*inputs)) : NULL;
+    if (count != 0 && (orders == NULL || inputs == NULL)) {
+        free(orders);
+        free(inputs);
+        return 0;
+    }
+
+    mpz_t group;
+    mpq_t covered, deficit, expected_total, expected_covered, expected_deficit;
+    mpz_init(group);
+    mpq_inits(covered, deficit, expected_total, expected_covered, expected_deficit, NULL);
+    int valid = mpz_set_str(group, columns[0], 10) == 0 &&
+                set_rational(expected_total, columns[1]) &&
+                set_rational(expected_covered, columns[3]) &&
+                set_rational(expected_deficit, columns[4]);
+    size_t initialized = 0;
+    while (valid && initialized < count) {
+        char *comma = strchr(order_text, ',');
+        if (comma != NULL) {
+            *comma = '\0';
+        }
+        mpz_init(orders[initialized]);
+        inputs[initialized] = orders[initialized];
+        valid = mpz_set_str(orders[initialized++], order_text, 10) == 0;
+        if (comma != NULL) {
+            order_text = comma + 1;
+        }
+    }
+    int matches = valid &&
+                  hecke_mass_orbit_deficit_checked(deficit, covered, group, inputs, count,
+                                                   expected_total) == HECKE_MASS_OK &&
+                  mpq_equal(covered, expected_covered) && mpq_equal(deficit, expected_deficit);
+    const char *status = "complete";
+    if (mpq_sgn(deficit) > 0) {
+        status = "missing";
+    } else if (mpq_sgn(deficit) < 0) {
+        status = "excess";
+    }
+    matches = matches && strcmp(status, expected_status) == 0;
+
+    while (initialized != 0) {
+        mpz_clear(orders[--initialized]);
+    }
+    mpz_clear(group);
+    mpq_clears(covered, deficit, expected_total, expected_covered, expected_deficit, NULL);
+    free(orders);
+    free(inputs);
+    return matches;
+}
+
+static int check_file(const char *path, int (*check)(char *))
+{
+    FILE *fixtures = fopen(path, "r");
     if (fixtures == NULL) {
-        perror(argv[1]);
-        return 1;
+        perror(path);
+        return 0;
     }
 
     size_t rows = 0;
@@ -292,13 +420,25 @@ int main(int argc, char **argv)
     char *line = NULL;
     while (valid && (line = read_line(fixtures, &io_error)) != NULL) {
         ++rows;
-        valid = check_row(line);
+        valid = check(line);
         free(line);
     }
     valid = valid && !io_error && !ferror(fixtures) && rows != 0;
     fclose(fixtures);
     if (!valid) {
-        fprintf(stderr, "Kernel fixture failed at line %zu in %s\n", rows, argv[1]);
+        fprintf(stderr, "Kernel fixture failed at line %zu in %s\n", rows, path);
     }
-    return valid ? 0 : 1;
+    return valid;
+}
+
+int main(int argc, char **argv)
+{
+    if (argc != 3) {
+        return 1;
+    }
+    if (!check_api_contracts() || !check_orbit_api_contracts()) {
+        fprintf(stderr, "C API contract checks failed\n");
+        return 1;
+    }
+    return check_file(argv[1], check_row) && check_file(argv[2], check_orbit_row) ? 0 : 1;
 }
