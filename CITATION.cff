@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "Please cite the workbench revision you used and credit the graph or Lean edition identified in your database."
+title: "hecke-mass-kernel"
+type: software
+authors:
+  - family-names: Harrington
+    given-names: "Brian 'redbeard'"
+    orcid: "https://orcid.org/0009-0000-4478-8141"
+license: Apache-2.0
