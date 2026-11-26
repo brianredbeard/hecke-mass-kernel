@@ -4,7 +4,7 @@ project(HeckeMass VERSION 0.1.0 LANGUAGES C)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-option(HECKE_MASS_ENABLE_RVV "Build the scaffold probe for RV64 with V" OFF)
+option(HECKE_MASS_ENABLE_RVV "Build the vector kernels for RV64 with V" OFF)
 option(HECKE_MASS_BUILD_FINITE_KERNEL "Build the GMP-backed finite kernel" ON)
 
 add_library(hecke_mass)
@@ -17,10 +17,11 @@ target_include_directories(hecke_mass PUBLIC
 set_target_properties(hecke_mass PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 if(HECKE_MASS_ENABLE_RVV)
-    target_sources(hecke_mass PRIVATE src/rvv/scaffold.c)
-    target_compile_options(hecke_mass PRIVATE -march=rv64gcv)
+    set(rvv_sources src/rvv/scaffold.c src/rvv/brandt.c)
+    target_sources(hecke_mass PRIVATE ${rvv_sources})
+    set_property(SOURCE ${rvv_sources} APPEND PROPERTY COMPILE_OPTIONS -march=rv64gcv)
 else()
-    target_sources(hecke_mass PRIVATE src/scaffold.c)
+    target_sources(hecke_mass PRIVATE src/scaffold.c src/brandt.c)
 endif()
 
 set(package_dir "${CMAKE_INSTALL_LIBDIR}/cmake/HeckeMass")
@@ -62,7 +63,9 @@ install(TARGETS hecke_mass EXPORT HeckeMassTargets
     LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
 )
-install(FILES include/hecke_mass/scaffold.h DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/hecke_mass")
+install(FILES include/hecke_mass/scaffold.h include/hecke_mass/brandt.h
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/hecke_mass"
+)
 install(EXPORT HeckeMassTargets NAMESPACE HeckeMass:: DESTINATION "${package_dir}")
 install(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/HeckeMassConfig.cmake"
@@ -77,6 +80,9 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
         target_link_libraries(hecke_mass_scaffold_vectors PRIVATE HeckeMass::hecke_mass)
         add_test(NAME scaffold_vectors COMMAND hecke_mass_scaffold_vectors
             "${CMAKE_CURRENT_SOURCE_DIR}/../tests/vectors/scaffold.csv")
+        add_executable(hecke_mass_brandt_counts tests/brandt_counts.c)
+        target_link_libraries(hecke_mass_brandt_counts PRIVATE HeckeMass::hecke_mass)
+        add_test(NAME brandt_counts COMMAND hecke_mass_brandt_counts)
         if(HECKE_MASS_BUILD_FINITE_KERNEL)
             add_executable(hecke_mass_kernel_vectors tests/kernel_vectors.c)
             target_link_libraries(hecke_mass_kernel_vectors PRIVATE HeckeMass::hecke_mass)

@@ -45,6 +45,10 @@ cargo test --manifest-path rust/Cargo.toml
 
 [Library installation and integration](docs/integration.md) · [Verification scope](docs/verification.md)
 
+RISC-V Linux users can try the [RVV Brandt counter and native benchmark](docs/integration.md#risc-v-vector-backend).
+The [SpacemiT matrix demo](examples/k3-ime/README.md) uses the K3's matrix
+instruction to multiply the level-23 Brandt operators.
+
 ## Worked examples
 
 The [six runnable examples](examples/rust/README.md) apply the two

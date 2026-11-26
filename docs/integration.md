@@ -56,9 +56,45 @@ coverage.
 
 ## RISC-V Vector backend
 
-`-DHECKE_MASS_ENABLE_RVV=ON` selects the RV64GCV implementation of the C scaffold probe. The resulting library requires a CPU or emulator with the RISC-V Vector extension. The CMake target and public header are the same for either backend.
+`hecke_mass_brandt_count_u32` counts a target class in a row of neighbor
+destinations, preserving repeated edges. Include `<hecke_mass/brandt.h>`
+and link `HeckeMass::hecke_mass`. Set `-DHECKE_MASS_ENABLE_RVV=ON` to
+select the RV64GCV implementation. It uses vector equality and mask
+population count, adjusting the active length for the last chunk. The
+count is an integer operation and needs no GMP.
 
-For a Linux cross-build of the probe, the CI recipe uses Clang 18, a RISC-V GNU cross toolchain, and QEMU user-mode emulation on Ubuntu 24.04. Use `HECKE_MASS_BUILD_FINITE_KERNEL=OFF` for probe-only builds without target GMP. The exact operations use scalar GMP arithmetic.
+On a RISC-V Linux host with GCC supporting RVV intrinsics, build and test
+natively. This build also includes the scalar GMP-backed rational kernel
+when GMP development files are installed.
+
+```sh
+cmake -S c -B build/rvv-native -DCMAKE_BUILD_TYPE=Release -DHECKE_MASS_ENABLE_RVV=ON
+cmake --build build/rvv-native
+ctest --test-dir build/rvv-native --output-on-failure
+```
+
+The native benchmark compares the vector counter with the same library's
+scalar implementation compiled without auto-vectorization. Run these commands
+against the static build above.
+
+```sh
+gcc -std=c99 -O3 -march=rv64gc -fno-tree-vectorize -I c/include \
+  -Dhecke_mass_brandt_count_u32=hecke_mass_brandt_count_scalar_u32 \
+  -c c/src/brandt.c -o build/rvv-native/brandt-scalar.o
+gcc -std=c99 -O3 -march=rv64gcv -I c/include examples/rvv/brandt_bench.c \
+  build/rvv-native/brandt-scalar.o build/rvv-native/libhecke_mass.a \
+  -o build/rvv-native/brandt-bench
+taskset -c 0 build/rvv-native/brandt-bench
+```
+
+On Pico's SpacemiT X100, the median was about 1.85 billion labels/s with RVV
+and 0.99 billion labels/s with scalar code. Both counted 4,041 matches in
+the same 4 MiB buffer. This measures repeated scans on one core with
+256-bit vectors. [Separate K3 matrix hardware demo](../examples/k3-ime/README.md)
+
+For a Linux cross-build, CI uses Clang 18, a RISC-V GNU cross toolchain, and
+QEMU user-mode emulation on Ubuntu 24.04. Set
+`HECKE_MASS_BUILD_FINITE_KERNEL=OFF` for a build without target GMP.
 
 ```sh
 cmake -S c -B build/rvv \
