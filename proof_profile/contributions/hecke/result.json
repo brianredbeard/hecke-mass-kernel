@@ -1,0 +1,51 @@
+{
+  "stage": "contribution preparation",
+  "status": "partial",
+  "edition": "compact Dirichlet GRH",
+  "root": "LFunction_eq_zero_re",
+  "revision": "72fead102f663d5c7a407964a13dc0cf9d977207",
+  "lean": "4.35.0",
+  "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+  "target_repository": "https://github.com/brianredbeard/hecke-mass-kernel",
+  "target_revision": "e1dacf2e224fe1264f06f3814ec1e9c74105f028",
+  "target_original_toolchain": "4.19.0",
+  "inputs": [
+    "../../extractions/mass/Minimal.lean",
+    "../../extractions/mass/ProjectBridge.lean",
+    "../../six-candidates/deep/trace-evidence.json"
+  ],
+  "outputs": [
+    "README.md",
+    "KernelBridge.lean",
+    "HeckeMassKernel/Finite.lean",
+    "verification.txt"
+  ],
+  "checks": {
+    "target_kernel_to_compact_mass": "kernel checked",
+    "target_hecke_rational_formula": "kernel checked",
+    "compact_weighted_sum_to_heckeFun": "kernel checked",
+    "bridge_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "compatibility_renames_verified": true,
+    "command": "bash proof_profile/research/contributions/hecke/check.sh",
+    "lean_timeout_seconds": 180
+  },
+  "open_questions": [
+    "The target normalized Setup.hecke is not proved equivalent to any compact operator",
+    "Geometric representative tables require independent certificates",
+    "Actual integration and CI in target checkout remain untested",
+    "Target kernel source requires Lean 4.35 compatibility changes"
+  ],
+  "sha256": {
+    "Finite-original.lean.snapshot": "6f1a8935f276f4b5691e2fe54e74402cc069941a5899697a1f450982f3e57da3",
+    "HeckeMassKernel/Finite.lean": "c0615098746d3a63e1ab1b5924870f33ade4ce5f89bae42f9897ca1f2d273c01",
+    "Minimal.lean": "f2afbe5e608531c41eca10ba4eeb4f4acd7d24846edf5ad9ca4e1d753646eb4b",
+    "ProjectBridge.lean": "8e186033785548ff9148bebafc932d5a8cf404ba6973d5025f51a982261abe71",
+    "KernelBridge.lean": "0d17abf113a82e575045c23a33f96de9a9d2f318dc680598c3d3aefdadc5671e",
+    "check.sh": "a730123e8e20c39c8cb4e3c5d63196961d544adb51e34e3bfce6841802cbc859",
+    "verification.txt": "6656487cb2e13b142eb27b89a45bb88ea7c8e970766bdcd9f10eed4e03ddedb5"
+  }
+}

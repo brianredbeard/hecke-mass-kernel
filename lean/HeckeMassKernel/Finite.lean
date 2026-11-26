@@ -1,5 +1,9 @@
 namespace HeckeMassKernel
 
+private theorem positiveIntCast {n : Nat} (h : 0 < n) : (0 : Int) < (n : Int) := by omega
+
+private theorem natAbsNatCast (n : Nat) : (n : Int).natAbs = n := rfl
+
 /-- An exact fraction stored with a positive denominator. -/
 structure Frac where
   num : Int
@@ -121,7 +125,7 @@ private theorem natAbs_ediv_of_dvd {x : Int} {g : Nat} (hg : 0 < g) (h : g ∣ x
   have hm := int_ediv_mul_cancel_of_nat_dvd h
   have hnat : (x / (g : Int)).natAbs * g = x.natAbs := by
     have := congrArg Int.natAbs hm
-    simpa [Int.natAbs_mul, Int.natAbs_ofNat] using this
+    simpa [Int.natAbs_mul, natAbsNatCast] using this
   have hdiv : (x.natAbs / g) * g = x.natAbs := Nat.div_mul_cancel h
   exact Nat.eq_of_mul_eq_mul_right hg (hnat.trans hdiv.symm)
 
@@ -154,7 +158,7 @@ theorem eq_of_equiv_of_gcd_one {a b : Frac}
   unfold Equiv at heq
   have hnat : a.num.natAbs * b.den = b.num.natAbs * a.den := by
     have := congrArg Int.natAbs heq
-    simpa [Int.natAbs_mul, Int.natAbs_ofNat] using this
+    simpa [Int.natAbs_mul, natAbsNatCast] using this
   have hdvd1 : a.den ∣ b.den := by
     have h1 : a.den ∣ b.num.natAbs * a.den := Nat.dvd_mul_left _ _
     rw [← hnat] at h1
@@ -575,8 +579,8 @@ theorem mul_sum (c : Frac) (xs : List Frac) :
 
 theorem num_nonneg_of_equiv {a b : Frac} (h : a ≈ b) (ha : 0 ≤ a.num) : 0 ≤ b.num := by
   unfold Equiv at h
-  have hposa : (0 : Int) < (a.den : Int) := Int.ofNat_pos.mpr a.positive
-  have hposb : (0 : Int) < (b.den : Int) := Int.ofNat_pos.mpr b.positive
+  have hposa : (0 : Int) < (a.den : Int) := positiveIntCast a.positive
+  have hposb : (0 : Int) < (b.den : Int) := positiveIntCast b.positive
   have hmul : 0 ≤ b.num * (a.den : Int) := by
     rw [← h]
     exact Int.mul_nonneg ha (Int.le_of_lt hposb)
@@ -588,8 +592,8 @@ theorem num_nonneg_of_equiv {a b : Frac} (h : a ≈ b) (ha : 0 ≤ a.num) : 0 �
 
 theorem num_pos_of_equiv {a b : Frac} (h : a ≈ b) (ha : 0 < a.num) : 0 < b.num := by
   unfold Equiv at h
-  have hposa : (0 : Int) < (a.den : Int) := Int.ofNat_pos.mpr a.positive
-  have hposb : (0 : Int) < (b.den : Int) := Int.ofNat_pos.mpr b.positive
+  have hposa : (0 : Int) < (a.den : Int) := positiveIntCast a.positive
+  have hposb : (0 : Int) < (b.den : Int) := positiveIntCast b.positive
   have hmul : 0 < b.num * (a.den : Int) := by
     rw [← h]
     exact Int.mul_pos ha hposb
@@ -611,7 +615,7 @@ theorem add_num_pos_of_pos_nonneg {a b : Frac} (ha : 0 < a.num) (hb : 0 ≤ b.nu
   apply num_pos_of_equiv (add_equiv_raw a b).symm
   dsimp only
   have hposa : (0 : Int) ≤ (a.den : Int) := Int.ofNat_nonneg a.den
-  have hposb : (0 : Int) < (b.den : Int) := Int.ofNat_pos.mpr b.positive
+  have hposb : (0 : Int) < (b.den : Int) := positiveIntCast b.positive
   have h1 : 0 < a.num * (b.den : Int) := Int.mul_pos ha hposb
   have h2 : 0 ≤ b.num * (a.den : Int) := Int.mul_nonneg hb hposa
   omega
@@ -622,14 +626,14 @@ theorem lt_add_of_pos {a b : Frac} (hb : 0 < b.num) : a < a.add b := by
   unfold Equiv at hraw
   dsimp only at hraw
   have hpos_ab : (0 : Int) < ((a.den * b.den : Nat) : Int) :=
-    Int.ofNat_pos.mpr (Nat.mul_pos a.positive b.positive)
-  have hpos_den : (0 : Int) < ((a.add b).den : Int) := Int.ofNat_pos.mpr (a.add b).positive
+    positiveIntCast (Nat.mul_pos a.positive b.positive)
+  have hpos_den : (0 : Int) < ((a.add b).den : Int) := positiveIntCast (a.add b).positive
   have hstrict : a.num * ((a.den * b.den : Nat) : Int) <
       (a.num * (b.den : Int) + b.num * (a.den : Int)) * (a.den : Int) := by
     rw [Int.natCast_mul, Int.add_mul]
     have ha_eq : a.num * ((a.den : Int) * (b.den : Int)) = a.num * (b.den : Int) * (a.den : Int) := by
       rw [Int.mul_comm (a.den : Int) (b.den : Int), ← Int.mul_assoc]
-    have hpos_a : (0 : Int) < (a.den : Int) := Int.ofNat_pos.mpr a.positive
+    have hpos_a : (0 : Int) < (a.den : Int) := positiveIntCast a.positive
     have hterm : 0 < b.num * (a.den : Int) * (a.den : Int) :=
       Int.mul_pos (Int.mul_pos hb hpos_a) hpos_a
     omega

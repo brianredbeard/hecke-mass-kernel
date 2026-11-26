@@ -1,0 +1,54 @@
+/mnt/bcache0/general/grh-lean/grh-compact/proof_profile/research/contributions/hecke/HeckeMassKernel/Finite.lean:309:29: warning: This simp argument is unused:
+  Int.mul_comm
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [Int.neg_mul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/mnt/bcache0/general/grh-lean/grh-compact/proof_profile/research/contributions/hecke/HeckeMassKernel/Finite.lean:373:43: warning: This simp argument is unused:
+  Int.mul_add
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [Int.natCast_mul, Int.add_mul, Int.mul_assoc, Int.add_assoc]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/mnt/bcache0/general/grh-lean/grh-compact/proof_profile/research/contributions/hecke/HeckeMassKernel/Finite.lean:605:44: warning: `Int.ofNat_nonneg` has been deprecated: Use `Int.natCast_nonneg` instead
+
+Hint: Replace the deprecated name:
+  I̵n̵t̵.̵o̵f̵N̵a̵t̵_̵n̵o̵n̵n̵e̵g̵I̲n̲t̲.̲n̲a̲t̲C̲a̲s̲t̲_̲n̲o̲n̲n̲e̲g̲
+/mnt/bcache0/general/grh-lean/grh-compact/proof_profile/research/contributions/hecke/HeckeMassKernel/Finite.lean:606:44: warning: `Int.ofNat_nonneg` has been deprecated: Use `Int.natCast_nonneg` instead
+
+Hint: Replace the deprecated name:
+  I̵n̵t̵.̵o̵f̵N̵a̵t̵_̵n̵o̵n̵n̵e̵g̵I̲n̲t̲.̲n̲a̲t̲C̲a̲s̲t̲_̲n̲o̲n̲n̲e̲g̲
+/mnt/bcache0/general/grh-lean/grh-compact/proof_profile/research/contributions/hecke/HeckeMassKernel/Finite.lean:613:44: warning: `Int.ofNat_nonneg` has been deprecated: Use `Int.natCast_nonneg` instead
+
+Hint: Replace the deprecated name:
+  I̵n̵t̵.̵o̵f̵N̵a̵t̵_̵n̵o̵n̵n̵e̵g̵I̲n̲t̲.̲n̲a̲t̲C̲a̲s̲t̲_̲n̲o̲n̲n̲e̲g̲
+/mnt/bcache0/general/grh-lean/grh-compact/proof_profile/research/contributions/hecke/HeckeMassKernel/Finite.lean:823:25: warning: This simp argument is unused:
+  beq_iff_eq
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [hsum, ↓reduceIte]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/mnt/bcache0/general/grh-lean/grh-compact/proof_profile/research/contributions/hecke/HeckeMassKernel/Finite.lean:825:25: warning: This simp argument is unused:
+  beq_iff_eq
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [hsum, ↓reduceIte]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+'ResearchMass.clean' does not depend on any axioms
+'ResearchMass.add' does not depend on any axioms
+'ResearchMass.mul' does not depend on any axioms
+'ResearchMass.reciprocalNat' does not depend on any axioms
+'ResearchMass.mass' does not depend on any axioms
+'ResearchMass.weightedSum' does not depend on any axioms
+'ResearchMass.mass_classSum' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ResearchMass.mass_classSum_real' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ResearchMass.weightedSum_heckeFun' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ResearchMass.value_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ResearchMass.value_mul' depends on axioms: [propext, Classical.choice, Quot.sound]
+'KernelCompact.mass_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'KernelCompact.mass_classSum_real' depends on axioms: [propext, Classical.choice, Quot.sound]
+'KernelCompact.hecke_value' depends on axioms: [propext, Classical.choice, Quot.sound]

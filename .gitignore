@@ -1,6 +1,13 @@
 /build/
 /lean/.lake/
-/proof_profile/
+/proof_profile/*
+!/proof_profile/contributions/
+/proof_profile/contributions/*
+!/proof_profile/contributions/hecke/
+/proof_profile/contributions/hecke/*
+!/proof_profile/contributions/hecke/Finite-original.lean.snapshot
+!/proof_profile/contributions/hecke/result.json
+!/proof_profile/contributions/hecke/verification.txt
 /rust/Cargo.lock
 /.venv/
 /media/
