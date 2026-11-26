@@ -93,7 +93,7 @@ jobs:
       - name: Install cross compiler and emulator
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-18 gcc-riscv64-linux-gnu qemu-user
+          sudo apt-get install -y clang-18 gcc-riscv64-linux-gnu libc6-dev-riscv64-cross qemu-user
       - name: Cross-build the RVV library and tests
         run: |
           cmake -S c -B build/rvv \
@@ -109,6 +109,6 @@ jobs:
           cmake --build build/rvv
       - name: Run the fixtures with 128-bit, 256-bit, and 512-bit vectors
         run: |
-          QEMU_CPU=rv64,v=true,vlen=128,elen=64 ctest --test-dir build/rvv --output-on-failure
-          QEMU_CPU=rv64,v=true,vlen=256,elen=64 ctest --test-dir build/rvv --output-on-failure
-          QEMU_CPU=rv64,v=true,vlen=512,elen=64 ctest --test-dir build/rvv --output-on-failure
+          for vlen in 128 256 512; do
+            QEMU_CPU="rv64,v=true,vlen=$vlen,elen=64" ctest --test-dir build/rvv --verbose
+          done

@@ -15,13 +15,23 @@ target_include_directories(hecke_mass PUBLIC
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 set_target_properties(hecke_mass PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+target_sources(hecke_mass PRIVATE src/f64.c)
 
 if(HECKE_MASS_ENABLE_RVV)
-    set(rvv_sources src/rvv/scaffold.c src/rvv/brandt.c)
+    set(rvv_sources src/rvv/scaffold.c src/rvv/brandt.c src/rvv/f64.c)
     target_sources(hecke_mass PRIVATE ${rvv_sources})
+    target_compile_definitions(hecke_mass PRIVATE HECKE_MASS_ENABLE_RVV=1)
     set_property(SOURCE ${rvv_sources} APPEND PROPERTY COMPILE_OPTIONS -march=rv64gcv)
 else()
     target_sources(hecke_mass PRIVATE src/scaffold.c src/brandt.c)
+endif()
+
+set(f64_sources src/f64.c src/rvv/f64.c)
+if(MSVC)
+    set_property(SOURCE ${f64_sources} APPEND PROPERTY COMPILE_OPTIONS /fp:strict)
+elseif(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    set_property(SOURCE ${f64_sources} APPEND PROPERTY COMPILE_OPTIONS -fno-fast-math -ffp-contract=off)
+    set_property(SOURCE src/f64.c APPEND PROPERTY COMPILE_OPTIONS -fno-tree-vectorize)
 endif()
 
 set(package_dir "${CMAKE_INSTALL_LIBDIR}/cmake/HeckeMass")
@@ -63,7 +73,7 @@ install(TARGETS hecke_mass EXPORT HeckeMassTargets
     LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
 )
-install(FILES include/hecke_mass/scaffold.h include/hecke_mass/brandt.h
+install(FILES include/hecke_mass/scaffold.h include/hecke_mass/brandt.h include/hecke_mass/f64.h
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/hecke_mass"
 )
 install(EXPORT HeckeMassTargets NAMESPACE HeckeMass:: DESTINATION "${package_dir}")
@@ -83,12 +93,33 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
         add_executable(hecke_mass_brandt_counts tests/brandt_counts.c)
         target_link_libraries(hecke_mass_brandt_counts PRIVATE HeckeMass::hecke_mass)
         add_test(NAME brandt_counts COMMAND hecke_mass_brandt_counts)
+        add_executable(hecke_mass_f64_vectors tests/f64_vectors.c)
+        target_include_directories(hecke_mass_f64_vectors PRIVATE support)
+        target_link_libraries(hecke_mass_f64_vectors PRIVATE HeckeMass::hecke_mass)
+        if(UNIX)
+            target_link_libraries(hecke_mass_f64_vectors PRIVATE m)
+        endif()
         if(HECKE_MASS_BUILD_FINITE_KERNEL)
             add_executable(hecke_mass_kernel_vectors tests/kernel_vectors.c)
             target_link_libraries(hecke_mass_kernel_vectors PRIVATE HeckeMass::hecke_mass)
             add_test(NAME kernel_vectors COMMAND hecke_mass_kernel_vectors
                 "${CMAKE_CURRENT_SOURCE_DIR}/../tests/vectors/kernel.tsv"
                 "${CMAKE_CURRENT_SOURCE_DIR}/../tests/vectors/orbit.tsv")
+            add_library(hecke_mass_f64_oracle STATIC support/f64_oracle.c)
+            target_include_directories(hecke_mass_f64_oracle PUBLIC support)
+            target_link_libraries(hecke_mass_f64_oracle PUBLIC HeckeMass::hecke_mass)
+            add_executable(hecke_mass_f64_oracle_tests tests/f64_oracle.c)
+            target_link_libraries(hecke_mass_f64_oracle_tests PRIVATE hecke_mass_f64_oracle)
+            if(UNIX)
+                target_link_libraries(hecke_mass_f64_oracle_tests PRIVATE m)
+                add_executable(hecke_mass_f64_bench ../examples/rvv/f64_bench.c)
+                target_link_libraries(hecke_mass_f64_bench PRIVATE hecke_mass_f64_oracle m)
+                if(HECKE_MASS_ENABLE_RVV)
+                    target_compile_definitions(hecke_mass_f64_bench PRIVATE HECKE_MASS_ENABLE_RVV=1)
+                endif()
+            endif()
+            add_test(NAME f64_oracle COMMAND hecke_mass_f64_oracle_tests)
         endif()
+        add_test(NAME f64_vectors COMMAND hecke_mass_f64_vectors)
     endif()
 endif()
