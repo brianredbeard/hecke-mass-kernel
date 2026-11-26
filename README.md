@@ -45,9 +45,20 @@ cargo test --manifest-path rust/Cargo.toml
 
 [Library installation and integration](docs/integration.md) · [Verification scope](docs/verification.md)
 
-RISC-V Linux users can try the [RVV Brandt counter and native benchmark](docs/integration.md#risc-v-vector-backend).
-The [SpacemiT matrix demo](examples/k3-ime/README.md) uses the K3's matrix
-instruction to multiply the level-23 Brandt operators.
+## RISC-V hardware results
+
+| Native benchmark | Scalar | Hardware backend | Same-board speedup |
+| --- | ---: | ---: | ---: |
+| SpacemiT K3 X100, exact Brandt destination count | 990 million labels/s | 1.95 billion labels/s (RVV) | **1.97×** |
+| SiFive P550, same destination count | 595 million labels/s | — | Scalar only |
+| SpacemiT K3 X100, packed INT8 matrix tile | 99.13 ns/tile | 7.01 ns/tile (base IME) | **14.1×** |
+
+RVV compares destination labels in chunks and counts the matching mask
+bits. The K3 matrix demo uses one signed INT8 `smt.vmadot` per packed
+product to reproduce the level-23 Brandt products exactly. These are
+single-core measurements on a fixed input buffer or prepared tiles.
+[Hardware walkthrough and reproduction commands](docs/benchmarks.md) ·
+[K3 matrix demo](examples/k3-ime/README.md)
 
 ## Worked examples
 

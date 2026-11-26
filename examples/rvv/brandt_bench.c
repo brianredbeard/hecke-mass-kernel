@@ -6,10 +6,24 @@
 #include <stdlib.h>
 #include <time.h>
 
+typedef size_t (*count_fn)(const uint32_t *, size_t, uint32_t);
+
+#if defined(__riscv_vector)
 size_t hecke_mass_brandt_count_scalar_u32(const uint32_t *destinations,
                                           size_t count, uint32_t target);
+#endif
 
-typedef size_t (*count_fn)(const uint32_t *, size_t, uint32_t);
+static const struct {
+    const char *name;
+    count_fn count;
+} backends[] = {
+#if defined(__riscv_vector)
+    {"scalar", hecke_mass_brandt_count_scalar_u32},
+    {"RVV", hecke_mass_brandt_count_u32},
+#else
+    {"scalar", hecke_mass_brandt_count_u32},
+#endif
+};
 
 static double monotonic_seconds(void)
 {
@@ -57,20 +71,19 @@ int main(void)
         expected += destinations[i] == target;
     }
 
+#if defined(__riscv_vector)
     unsigned long vlen_bytes;
     __asm__ volatile ("csrr %0, vlenb" : "=r" (vlen_bytes));
-    printf("VLEN=%lu bits, %zu destinations, %zu matches\n",
-           vlen_bytes * 8, length, expected);
-    count_fn counts[] = {
-        hecke_mass_brandt_count_scalar_u32,
-        hecke_mass_brandt_count_u32,
-    };
-    const char *names[] = {"scalar", "RVV"};
+    printf("VLEN=%lu bits, ", vlen_bytes * 8);
+#endif
+    printf("%zu destinations, %zu matches\n", length, expected);
+
+    const size_t backend_count = sizeof(backends) / sizeof(backends[0]);
     for (size_t trial = 0; trial < 6; ++trial) {
-        size_t first = trial % 2;
-        for (size_t run = 0; run < 2; ++run) {
-            size_t backend = (first + run) % 2;
-            measure(names[backend], counts[backend], destinations, length, target, expected);
+        for (size_t run = 0; run < backend_count; ++run) {
+            const size_t backend = (trial + run) % backend_count;
+            measure(backends[backend].name, backends[backend].count, destinations,
+                    length, target, expected);
         }
     }
     free(destinations);

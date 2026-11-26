@@ -47,3 +47,8 @@ tables, missing and extra entries, fractional coverage, and integers beyond
 machine and binary64 precision. The C and Rust suites replay every row.
 
 CI compares freshly generated fixtures with the checked-in files. The C suite tests both Release and ASan/UBSan builds (with `-Wall -Wextra -Werror`), exercises checked invalid-input rejection, pointer aliasing, and permutation invariance, and builds the installed CMake consumer requiring `COMPONENTS FiniteKernel`. The Rust suite runs unit tests, doctests, randomized property checks, fixture replay, and all six worked examples. The RVV job runs the scaffold and exact Brandt count tests under QEMU at vector lengths of 128, 256, and 512 bits. The Brandt test replays the level-11 and level-23 degree-two rows and compares vector tails against a scalar count. The Lean theorems apply to the Lean reference.
+
+Native checks on Pico also replayed the Brandt counts and compared every
+entry of both K3 matrix products with scalar arithmetic. The hardware
+benchmarks check the timed workloads against exact counts or products.
+[Native measurements and methodology](benchmarks.md)

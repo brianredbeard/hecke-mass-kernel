@@ -73,24 +73,11 @@ cmake --build build/rvv-native
 ctest --test-dir build/rvv-native --output-on-failure
 ```
 
-The native benchmark compares the vector counter with the same library's
-scalar implementation compiled without auto-vectorization. Run these commands
-against the static build above.
-
-```sh
-gcc -std=c99 -O3 -march=rv64gc -fno-tree-vectorize -I c/include \
-  -Dhecke_mass_brandt_count_u32=hecke_mass_brandt_count_scalar_u32 \
-  -c c/src/brandt.c -o build/rvv-native/brandt-scalar.o
-gcc -std=c99 -O3 -march=rv64gcv -I c/include examples/rvv/brandt_bench.c \
-  build/rvv-native/brandt-scalar.o build/rvv-native/libhecke_mass.a \
-  -o build/rvv-native/brandt-bench
-taskset -c 0 build/rvv-native/brandt-bench
-```
-
-On Pico's SpacemiT X100, the median was about 1.85 billion labels/s with RVV
-and 0.99 billion labels/s with scalar code. Both counted 4,041 matches in
-the same 4 MiB buffer. This measures repeated scans on one core with
-256-bit vectors. [Separate K3 matrix hardware demo](../examples/k3-ime/README.md)
+The same counter API is available with the scalar build on systems such as
+the SiFive P550. The benchmark guide gives the exact native commands for
+both backends, explains their instructions, and records the X100 and P550
+measurements. [RISC-V hardware benchmarks](benchmarks.md) ·
+[K3 matrix hardware demo](../examples/k3-ime/README.md)
 
 For a Linux cross-build, CI uses Clang 18, a RISC-V GNU cross toolchain, and
 QEMU user-mode emulation on Ubuntu 24.04. Set
